@@ -1,53 +1,48 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-/* ─── The 4 hero bowls (transparent PNG backgrounds) ─────────────────────── */
 const BOWLS = [
   {
     id: "haven",
     name: "Haven Speciaal",
-    tagline: "Tuna · Salmon · Crab · Avocado · Tobiko",
-    price: "€16.50",
+    tagline: "Zalm & tonijn · Avocado · Surimi · Masago",
+    price: "€14.90",
     image: "/bowl-haven.png",
   },
   {
     id: "garnalen",
     name: "Poke Garnalen",
-    tagline: "Prawns · Edamame · Radish · Ponzu",
-    price: "€15.50",
+    tagline: "Garnaal · Edamame · Rode biet · Sesammix",
+    price: "€13.90",
     image: "/bowl-garnalen-png.png",
   },
   {
     id: "tofu",
     name: "Shoyu Tofu",
-    tagline: "Crispy Tofu · Corn · Cucumber · Avocado",
-    price: "€13.50",
+    tagline: "Gemarineerde tofu · Maïs · Komkommer · Avocado",
+    price: "€13.90",
     image: "/bowl-tofu.png",
   },
   {
     id: "vlees",
     name: "Vlees Speciaal",
-    tagline: "Marinated Beef · Bell Pepper · Sesame",
-    price: "€17.50",
+    tagline: "Gemarineerd rundvlees · Paprika · Sesammix",
+    price: "€13.90",
     image: "/bowl-vlees.png",
   },
 ];
 
-/* ─── Orbital geometry (SVG units: viewBox 0 0 700 600) ──────────────────── */
 const OX = 760, OY = 300, OR = 320;
 const ANGLES = [180, 212, 247, 148, 113];
-
 function pt(deg: number) {
   const r = (deg * Math.PI) / 180;
   return { x: OX + OR * Math.cos(r), y: OY + OR * Math.sin(r) };
 }
 const SLOTS = ANGLES.map(pt);
-
 const arcStart = pt(247);
 const arcEnd   = pt(113);
 const ARC_PATH = `M ${arcStart.x.toFixed(1)} ${arcStart.y.toFixed(1)} A ${OR} ${OR} 0 0 0 ${arcEnd.x.toFixed(1)} ${arcEnd.y.toFixed(1)}`;
 
-/* ─── Floating leaf particles ─────────────────────────────────────────────── */
 const LEAVES = [
   { id: 1, w: 52, top: "9%",  left: "5%",  z: 5,  dur: 7.5, delay: 0,    rot: 18,  tx: 40, ty: -30 },
   { id: 2, w: 36, top: "22%", left: "2%",  z: 20, dur: 9.0, delay: -3,   rot: -22, tx: 25, ty: -50 },
@@ -104,16 +99,13 @@ export function Hero() {
       className="relative min-h-screen flex items-center overflow-hidden pt-20"
       style={{ background: "#0E1621" }}
     >
-      {/* Radial glow behind bowl area */}
+      {/* Radial glow */}
       <div
         className="absolute right-0 top-1/2 -translate-y-1/2 w-[55vw] h-[90vh] pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse at center, #1A2432 0%, #0E1621 70%)",
-          zIndex: 1,
-        }}
+        style={{ background: "radial-gradient(ellipse at center, #1A2432 0%, #0E1621 70%)", zIndex: 1 }}
       />
 
-      {/* ── Behind-bowl leaves (z:5) ──────────────────────────────────────── */}
+      {/* Behind-bowl leaves z:5 */}
       {LEAVES.filter(l => l.z === 5).map((l) => (
         <motion.div
           key={l.id}
@@ -126,16 +118,14 @@ export function Hero() {
         </motion.div>
       ))}
 
-      {/* ── Main grid ─────────────────────────────────────────────────────── */}
       <div
-        className="container mx-auto px-6 relative grid lg:grid-cols-[1fr_1fr] gap-8 items-center min-h-[calc(100vh-5rem)]"
+        className="container mx-auto px-5 relative grid lg:grid-cols-[1fr_1fr] gap-8 items-center min-h-[calc(100vh-5rem)]"
         style={{ zIndex: 10 }}
       >
-        {/* ── Left: Text ──────────────────────────────────────────────────── */}
-        <div className="flex flex-col items-start text-left space-y-6">
+        {/* Left: Text */}
+        <div className="flex flex-col items-start text-left space-y-5">
 
-          {/* Headline — staggered word reveal */}
-          {["Fresh.", "Bold.", "Poke."].map((word, i) => (
+          {["Vers.", "Gedurfd.", "Poke."].map((word, i) => (
             <div key={word} className="overflow-hidden">
               <motion.span
                 className="block font-display font-black leading-[0.85] tracking-tighter"
@@ -159,10 +149,9 @@ export function Hero() {
             animate={entered ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.45 }}
           >
-            Ocean vibes, tropical energy, and the freshest ingredients — crafted fresh to order.
+            Ocean vibes, tropische energie en de meest verse ingrediënten — vers voor u bereid.
           </motion.p>
 
-          {/* CTAs */}
           <motion.div
             className="flex gap-3 flex-wrap"
             initial={{ opacity: 0, y: 20 }}
@@ -171,50 +160,48 @@ export function Hero() {
           >
             <button
               onClick={() => document.getElementById("builder")?.scrollIntoView({ behavior: "smooth" })}
-              data-testid="button-build-bowl"
+              style={{ background: "#F26522", boxShadow: "0 0 24px rgba(242,101,34,0.35)", touchAction: "manipulation" }}
               className="px-8 py-4 rounded-full font-bold text-base text-white transition-all duration-300 hover:scale-[1.03] active:scale-95"
-              style={{ background: "#F26522", boxShadow: "0 0 24px rgba(242,101,34,0.35)" }}
+              data-testid="button-bestel-nu"
             >
-              Order Now
+              Bestel Nu
             </button>
             <button
               onClick={() => document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" })}
-              data-testid="button-see-menu"
+              style={{ border: "1px solid rgba(255,255,255,0.15)", color: "#A0AEC0", touchAction: "manipulation" }}
               className="px-8 py-4 rounded-full font-bold text-base transition-all duration-300 hover:scale-[1.03]"
-              style={{ border: "1px solid rgba(255,255,255,0.15)", color: "#A0AEC0" }}
+              data-testid="button-ons-menu"
             >
-              Our Menu
+              Ons Menu
             </button>
           </motion.div>
 
-          {/* Nav text "Previous · Next" style */}
           <motion.div
-            className="flex gap-6 pt-2"
+            className="flex gap-6 pt-1"
             initial={{ opacity: 0 }}
             animate={entered ? { opacity: 1 } : {}}
             transition={{ duration: 0.6, delay: 0.7 }}
           >
             <button
               onClick={() => navigate((active - 1 + BOWLS.length) % BOWLS.length)}
-              className="text-sm font-semibold flex items-center gap-2 transition-colors"
-              style={{ color: "#A0AEC0" }}
-              data-testid="button-prev-text"
+              className="text-sm font-semibold flex items-center gap-2"
+              style={{ color: "#A0AEC0", touchAction: "manipulation" }}
+              data-testid="button-vorige"
             >
               <span style={{ display: "inline-block", width: 20, height: 1, background: "#F26522", verticalAlign: "middle" }} />
-              Previous
+              Vorige
             </button>
             <button
               onClick={() => navigate((active + 1) % BOWLS.length)}
-              className="text-sm font-semibold flex items-center gap-2 transition-colors"
-              style={{ color: "#A0AEC0" }}
-              data-testid="button-next-text"
+              className="text-sm font-semibold flex items-center gap-2"
+              style={{ color: "#A0AEC0", touchAction: "manipulation" }}
+              data-testid="button-volgende"
             >
-              Next
+              Volgende
               <span style={{ display: "inline-block", width: 20, height: 1, background: "#F26522", verticalAlign: "middle" }} />
             </button>
           </motion.div>
 
-          {/* Active bowl label + price */}
           <AnimatePresence mode="wait">
             <motion.div
               key={active + "-lbl"}
@@ -226,52 +213,32 @@ export function Hero() {
               <p className="font-display font-bold text-2xl text-white" data-testid="text-bowl-name">
                 {BOWLS[active].name}
               </p>
-              <p className="text-sm mt-0.5" style={{ color: "#A0AEC0" }} data-testid="text-bowl-tagline">
+              <p className="text-sm mt-0.5" style={{ color: "#A0AEC0" }}>
                 {BOWLS[active].tagline}
               </p>
-              <p className="font-bold text-xl mt-1" style={{ color: "#F26522" }} data-testid="text-bowl-price">
+              <p className="font-bold text-xl mt-1" style={{ color: "#F26522" }}>
                 {BOWLS[active].price}
               </p>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* ── Right: Orbital carousel ──────────────────────────────────────── */}
+        {/* Right: Orbital carousel */}
         <div className="relative" style={{ height: "min(620px, 82vh)" }}>
-          {/* SVG arc track */}
-          <svg
-            viewBox="0 0 700 600"
-            className="absolute inset-0 w-full h-full"
-            style={{ overflow: "visible" }}
-            aria-hidden="true"
-          >
-            <path
-              d={ARC_PATH}
-              fill="none"
-              stroke="#F26522"
-              strokeOpacity="0.35"
-              strokeWidth="1.5"
-              strokeDasharray="6 8"
-              strokeLinecap="round"
-            />
+          <svg viewBox="0 0 700 600" className="absolute inset-0 w-full h-full" style={{ overflow: "visible" }} aria-hidden="true">
+            <path d={ARC_PATH} fill="none" stroke="#F26522" strokeOpacity="0.35" strokeWidth="1.5" strokeDasharray="6 8" strokeLinecap="round" />
             {SLOTS.slice(1).map((s, i) => (
               <circle key={i} cx={s.x} cy={s.y} r="3.5" fill="#F26522" fillOpacity="0.3" />
             ))}
           </svg>
 
-          {/* ── Active bowl — Layer 2 (z:10), spring spin-in/out ── */}
+          {/* Active bowl */}
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={BOWLS[active].id + "-main"}
               custom={direction}
               className="absolute"
-              style={{
-                width: 320, height: 320,
-                left: SLOTS[0].x / 700 * 100 + "%",
-                top:  SLOTS[0].y / 600 * 100 + "%",
-                transform: "translate(-50%, -50%)",
-                zIndex: 10,
-              }}
+              style={{ width: 320, height: 320, left: SLOTS[0].x / 700 * 100 + "%", top: SLOTS[0].y / 600 * 100 + "%", transform: "translate(-50%, -50%)", zIndex: 10 }}
               variants={{
                 enter: (dir: number) => ({ rotate: dir * 360, scale: 0.5, opacity: 0, x: dir * 80, y: dir * 60 }),
                 center: { rotate: 0, scale: 1, opacity: 1, x: 0, y: 0 },
@@ -282,7 +249,6 @@ export function Hero() {
               exit="exit"
               transition={SPRING}
             >
-              {/* Continuous float */}
               <motion.img
                 src={BOWLS[active].image}
                 alt={BOWLS[active].name}
@@ -290,9 +256,7 @@ export function Hero() {
                 style={{ filter: "drop-shadow(0 32px 64px rgba(0,0,0,0.7))" }}
                 animate={{ y: [-12, 12, -12] }}
                 transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-                data-testid={`img-hero-bowl-${BOWLS[active].id}`}
               />
-              {/* Price tag */}
               <motion.div
                 className="absolute -top-2 -right-2 px-3 py-1.5 rounded-full font-bold text-sm text-white"
                 style={{ background: "#F26522", boxShadow: "0 4px 14px rgba(242,101,34,0.5)" }}
@@ -305,33 +269,29 @@ export function Hero() {
             </motion.div>
           </AnimatePresence>
 
-          {/* ── Thumbnail bowls on arc ── */}
+          {/* Thumbnails */}
           {thumbBowls.map((bowl, tIdx) => {
             const slot = tIdx + 1;
             if (slot >= SLOTS.length) return null;
             const pos = SLOTS[slot];
-            const sz = slot <= 2 ? 80 : 80;
             const isHighlight = slot === 1;
             return (
               <motion.button
                 key={bowl.id + "-thumb"}
-                className="absolute rounded-full overflow-hidden transition-all"
+                className="absolute rounded-full overflow-hidden"
                 style={{
-                  width: sz, height: sz,
-                  left: pos.x / 700 * 100 + "%",
-                  top: pos.y / 600 * 100 + "%",
-                  transform: "translate(-50%, -50%)",
-                  zIndex: 8,
+                  width: 80, height: 80,
+                  left: pos.x / 700 * 100 + "%", top: pos.y / 600 * 100 + "%",
+                  transform: "translate(-50%, -50%)", zIndex: 8,
                   border: isHighlight ? "2px solid #F26522" : "2px solid #1A2432",
-                  boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
-                  background: "#1A2432",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.4)", background: "#1A2432",
+                  touchAction: "manipulation",
                 }}
                 onClick={() => navigate(BOWLS.indexOf(bowl))}
                 initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: isHighlight ? 1.15 : 1 }}
                 transition={{ ...SPRING, delay: 0.08 * tIdx }}
                 whileHover={{ scale: 1.18, borderColor: "#F26522" }}
-                data-testid={`button-bowl-thumb-${bowl.id}`}
               >
                 <img src={bowl.image} alt={bowl.name} className="w-full h-full object-contain" />
               </motion.button>
@@ -345,20 +305,16 @@ export function Hero() {
                 key={i}
                 onClick={() => navigate(i)}
                 className="rounded-full"
-                animate={{
-                  width: i === active ? 22 : 7,
-                  background: i === active ? "#F26522" : "rgba(255,255,255,0.2)",
-                }}
-                style={{ height: 7 }}
+                animate={{ width: i === active ? 22 : 7, background: i === active ? "#F26522" : "rgba(255,255,255,0.2)" }}
+                style={{ height: 7, touchAction: "manipulation" }}
                 transition={{ duration: 0.3 }}
-                data-testid={`button-dot-${i}`}
               />
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── Front leaves (z:20 — pass over bowl) ─────────────────────────── */}
+      {/* Front leaves z:20 */}
       {LEAVES.filter(l => l.z === 20).map((l) => (
         <motion.div
           key={l.id}
@@ -371,12 +327,8 @@ export function Hero() {
         </motion.div>
       ))}
 
-      {/* "Stay healthy · Stay fresh" bottom text */}
-      <div
-        className="absolute bottom-6 left-6 text-xs font-medium tracking-widest uppercase"
-        style={{ color: "#A0AEC0", opacity: 0.6, zIndex: 10 }}
-      >
-        Stay Fresh · Stay Healthy
+      <div className="absolute bottom-6 left-6 text-xs font-medium tracking-widest uppercase" style={{ color: "#A0AEC0", opacity: 0.6, zIndex: 10 }}>
+        Vers Bereid · Elke Dag
       </div>
     </section>
   );
