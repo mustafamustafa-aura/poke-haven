@@ -1,97 +1,74 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
+/* ─── The 4 hero bowls (transparent PNG backgrounds) ─────────────────────── */
 const BOWLS = [
   {
     id: "haven",
     name: "Haven Speciaal",
-    tagline: "Tuna · Salmon · Crab · Avocado",
+    tagline: "Tuna · Salmon · Crab · Avocado · Tobiko",
     price: "€16.50",
-    image: "/bowl-haven-speciaal.webp",
+    image: "/bowl-haven.png",
   },
   {
     id: "garnalen",
     name: "Poke Garnalen",
     tagline: "Prawns · Edamame · Radish · Ponzu",
     price: "€15.50",
-    image: "/bowl-garnalen.webp",
+    image: "/bowl-garnalen-png.png",
   },
   {
     id: "tofu",
     name: "Shoyu Tofu",
-    tagline: "Crispy Tofu · Corn · Cucumber · Sesame",
+    tagline: "Crispy Tofu · Corn · Cucumber · Avocado",
     price: "€13.50",
-    image: "/bowl-shoyu-tofu.webp",
+    image: "/bowl-tofu.png",
   },
   {
     id: "vlees",
     name: "Vlees Speciaal",
-    tagline: "Wagyu Beef · Tomato · Bell Pepper · Shoyu",
+    tagline: "Marinated Beef · Bell Pepper · Sesame",
     price: "€17.50",
-    image: "/bowl-vlees-speciaal.webp",
+    image: "/bowl-vlees.png",
   },
 ];
 
-/* ─── Orbital geometry in SVG units (viewBox="0 0 700 600") ───────────────── */
-const OX = 760; // orbit centre x  (off-screen right)
-const OY = 300; // orbit centre y
-const OR = 320; // orbit radius
-
-const ANGLES = [180, 212, 247, 148, 113]; // [active, thumb1-upper-near, thumb2-upper-far, thumb3-lower-near, thumb4-lower-far]
+/* ─── Orbital geometry (SVG units: viewBox 0 0 700 600) ──────────────────── */
+const OX = 760, OY = 300, OR = 320;
+const ANGLES = [180, 212, 247, 148, 113];
 
 function pt(deg: number) {
   const r = (deg * Math.PI) / 180;
   return { x: OX + OR * Math.cos(r), y: OY + OR * Math.sin(r) };
 }
-
 const SLOTS = ANGLES.map(pt);
-// SLOTS[0] → active centre ≈ (440, 300)
 
-/* ─── Debris particles ────────────────────────────────────────────────────── */
-const DEBRIS = [
-  { id: 1, shape: "circle", color: "#FF6B47", w: 56, h: 56, top: "8%",  left: "4%",  zBehind: true,  dur: 3.8, delay: 0,   rotRange: 20,  parallax: 0.6 },
-  { id: 2, shape: "leaf",   color: "#9BE36A", w: 48, h: 48, top: "18%", left: "2%",  zBehind: false, dur: 4.5, delay: 0.9, rotRange: -25, parallax: 1.2 },
-  { id: 3, shape: "ring",   color: "#9BE36A", w: 60, h: 60, top: "60%", left: "3%",  zBehind: true,  dur: 5.1, delay: 0.4, rotRange: 15,  parallax: 0.4 },
-  { id: 4, shape: "dot",    color: "#FF6B47", w: 24, h: 24, top: "75%", left: "6%",  zBehind: false, dur: 3.2, delay: 1.2, rotRange: -18, parallax: 0.8 },
-  { id: 5, shape: "leaf",   color: "#FF6B47", w: 40, h: 40, top: "88%", left: "2%",  zBehind: true,  dur: 4.0, delay: 0.6, rotRange: 22,  parallax: 1.0 },
-  { id: 6, shape: "circle", color: "#F8F4EC", w: 20, h: 20, top: "42%", left: "1%",  zBehind: false, dur: 3.6, delay: 1.5, rotRange: -14, parallax: 1.4 },
+const arcStart = pt(247);
+const arcEnd   = pt(113);
+const ARC_PATH = `M ${arcStart.x.toFixed(1)} ${arcStart.y.toFixed(1)} A ${OR} ${OR} 0 0 0 ${arcEnd.x.toFixed(1)} ${arcEnd.y.toFixed(1)}`;
+
+/* ─── Floating leaf particles ─────────────────────────────────────────────── */
+const LEAVES = [
+  { id: 1, w: 52, top: "9%",  left: "5%",  z: 5,  dur: 7.5, delay: 0,    rot: 18,  tx: 40, ty: -30 },
+  { id: 2, w: 36, top: "22%", left: "2%",  z: 20, dur: 9.0, delay: -3,   rot: -22, tx: 25, ty: -50 },
+  { id: 3, w: 28, top: "58%", left: "3%",  z: 5,  dur: 8.2, delay: -5,   rot: 15,  tx: 35, ty: -40 },
+  { id: 4, w: 20, top: "75%", left: "6%",  z: 20, dur: 6.8, delay: -1.5, rot: -14, tx: 20, ty: -35 },
+  { id: 5, w: 44, top: "86%", left: "2%",  z: 5,  dur: 10,  delay: -7,   rot: 20,  tx: 45, ty: -25 },
+  { id: 6, w: 30, top: "42%", left: "1%",  z: 20, dur: 8.5, delay: -4,   rot: -18, tx: 30, ty: -45 },
+  { id: 7, w: 24, top: "35%", right: "4%", z: 5,  dur: 7.2, delay: -2,   rot: 16,  tx: -30, ty: -35 },
+  { id: 8, w: 38, top: "65%", right: "3%", z: 20, dur: 9.5, delay: -6,   rot: -20, tx: -40, ty: -28 },
 ];
 
-function DebrisSvg({ shape, color, w, h }: { shape: string; color: string; w: number; h: number }) {
-  if (shape === "leaf")
-    return (
-      <svg width={w} height={h} viewBox="0 0 50 50">
-        <ellipse cx="25" cy="25" rx="22" ry="11" fill={color} opacity="0.8" transform="rotate(-38 25 25)" />
-        <line x1="25" y1="14" x2="25" y2="38" stroke={color} strokeWidth="1.5" opacity="0.5" />
-      </svg>
-    );
-  if (shape === "ring")
-    return (
-      <svg width={w} height={h} viewBox="0 0 50 50">
-        <circle cx="25" cy="25" r="19" fill="none" stroke={color} strokeWidth="5" opacity="0.65" />
-      </svg>
-    );
-  if (shape === "dot")
-    return (
-      <svg width={w} height={h} viewBox="0 0 50 50">
-        <circle cx="25" cy="25" r="22" fill={color} opacity="0.7" />
-      </svg>
-    );
+function LeafSvg({ w }: { w: number }) {
   return (
-    <svg width={w} height={h} viewBox="0 0 50 50">
-      <circle cx="25" cy="25" r="20" fill={color} opacity="0.72" />
+    <svg width={w} height={w} viewBox="0 0 50 50">
+      <ellipse cx="25" cy="25" rx="21" ry="10" fill="#59B259" opacity="0.8" transform="rotate(-38 25 25)" />
+      <line x1="25" y1="14" x2="25" y2="38" stroke="#59B259" strokeWidth="1.5" opacity="0.4" />
     </svg>
   );
 }
 
-/* ─── Orbital arc SVG path from slot[4] to slot[1] through the leftward arc ─ */
-// Arc goes from upper-far (247°) down through 180° to lower-far (113°)
-const arcStart = pt(247);
-const arcEnd = pt(113);
-const ARC_PATH = `M ${arcStart.x.toFixed(1)} ${arcStart.y.toFixed(1)} A ${OR} ${OR} 0 0 0 ${arcEnd.x.toFixed(1)} ${arcEnd.y.toFixed(1)}`;
-
 const SPRING = { type: "spring" as const, stiffness: 120, damping: 14, mass: 1 };
-const THUMB_SIZES = [300, 78, 60, 78, 60]; // px: active | near | far | near | far
 
 export function Hero() {
   const [active, setActive] = useState(0);
@@ -99,7 +76,7 @@ export function Hero() {
   const [entered, setEntered] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  useEffect(() => { setTimeout(() => setEntered(true), 120); }, []);
+  useEffect(() => { setTimeout(() => setEntered(true), 100); }, []);
 
   const startTimer = () => {
     timerRef.current = setInterval(() => {
@@ -108,7 +85,10 @@ export function Hero() {
     }, 4800);
   };
 
-  useEffect(() => { startTimer(); return () => { if (timerRef.current) clearInterval(timerRef.current); }; }, []);
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
 
   const navigate = (next: number) => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -117,69 +97,55 @@ export function Hero() {
     startTimer();
   };
 
-  const words = ["Fresh.", "Bold.", "Poke."];
-
-  // Map bowl indices to orbital slots
-  // slot 0 = active bowl
-  // slot 1 = bowl that was active before (upper-near)
-  // slot 2 = upper-far
-  // slot 3 = next bowl (lower-near)
-  // slot 4 = lower-far
-  const bowlOrder = BOWLS.map((_, i) => {
-    const diff = ((i - active) % BOWLS.length + BOWLS.length) % BOWLS.length;
-    return diff; // 0=active, 1=next, 2=next+1, 3=prev(near), ...
-  });
-
   const thumbBowls = BOWLS.filter((_, i) => i !== active);
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden bg-background pt-20">
+    <section
+      className="relative min-h-screen flex items-center overflow-hidden pt-20"
+      style={{ background: "#0E1621" }}
+    >
+      {/* Radial glow behind bowl area */}
+      <div
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-[55vw] h-[90vh] pointer-events-none"
+        style={{
+          background: "radial-gradient(ellipse at center, #1A2432 0%, #0E1621 70%)",
+          zIndex: 1,
+        }}
+      />
 
-      {/* ── Layer 1: background blobs ───────────────────────────────────────── */}
-      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1 }}>
+      {/* ── Behind-bowl leaves (z:5) ──────────────────────────────────────── */}
+      {LEAVES.filter(l => l.z === 5).map((l) => (
         <motion.div
-          className="absolute rounded-full"
-          style={{ top: "-5%", left: "-8%", width: "50vw", height: "50vw", background: "radial-gradient(circle, rgba(255,107,71,0.12) 0%, transparent 70%)" }}
-          animate={{ x: [0, 50, 0], y: [0, -30, 0], scale: [1, 1.08, 1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div
-          className="absolute rounded-full"
-          style={{ bottom: "-5%", right: "-5%", width: "40vw", height: "40vw", background: "radial-gradient(circle, rgba(155,227,106,0.08) 0%, transparent 70%)" }}
-          animate={{ x: [0, -40, 0], y: [0, 40, 0], scale: [1, 1.12, 1] }}
-          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-        />
-      </div>
-
-      {/* ── Layer 2 (BEHIND bowl): debris that stays behind ─────────────────── */}
-      {DEBRIS.filter(d => d.zBehind).map((d) => (
-        <motion.div
-          key={d.id}
+          key={l.id}
           className="absolute pointer-events-none"
-          style={{ top: d.top, left: d.left, zIndex: 5 }}
-          animate={{ y: [0, -24 * d.parallax, 0], rotate: [0, d.rotRange, 0] }}
-          transition={{ duration: d.dur, delay: d.delay, repeat: Infinity, ease: "easeInOut" }}
+          style={{ top: l.top, left: (l as any).left, right: (l as any).right, zIndex: 5 }}
+          animate={{ x: [0, l.tx, 0], y: [0, l.ty, 0], rotate: [0, l.rot, 0] }}
+          transition={{ duration: l.dur, delay: l.delay, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" }}
         >
-          <DebrisSvg shape={d.shape} color={d.color} w={d.w} h={d.h} />
+          <LeafSvg w={l.w} />
         </motion.div>
       ))}
 
-      {/* ── Main layout grid ────────────────────────────────────────────────── */}
-      <div className="container mx-auto px-6 relative grid lg:grid-cols-[1fr_1fr] gap-8 items-center min-h-[calc(100vh-5rem)]" style={{ zIndex: 10 }}>
+      {/* ── Main grid ─────────────────────────────────────────────────────── */}
+      <div
+        className="container mx-auto px-6 relative grid lg:grid-cols-[1fr_1fr] gap-8 items-center min-h-[calc(100vh-5rem)]"
+        style={{ zIndex: 10 }}
+      >
+        {/* ── Left: Text ──────────────────────────────────────────────────── */}
+        <div className="flex flex-col items-start text-left space-y-6">
 
-        {/* ── Text column ─────────────────────────────────────────────────── */}
-        <div className="flex flex-col items-start text-left space-y-7">
-          {words.map((word, i) => (
+          {/* Headline — staggered word reveal */}
+          {["Fresh.", "Bold.", "Poke."].map((word, i) => (
             <div key={word} className="overflow-hidden">
               <motion.span
                 className="block font-display font-black leading-[0.85] tracking-tighter"
                 style={{
                   fontSize: "clamp(3.5rem, 9vw, 8.5rem)",
-                  color: word === "Poke." ? "#FF6B47" : "hsl(var(--foreground))",
+                  color: word === "Poke." ? "#F26522" : "#FFFFFF",
                 }}
                 initial={{ y: "108%", opacity: 0 }}
                 animate={entered ? { y: 0, opacity: 1 } : {}}
-                transition={{ duration: 0.78, delay: i * 0.13, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.75, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
               >
                 {word}
               </motion.span>
@@ -187,114 +153,129 @@ export function Hero() {
           ))}
 
           <motion.p
-            className="text-lg text-foreground/60 max-w-sm font-medium leading-relaxed"
+            className="text-base max-w-xs leading-relaxed"
+            style={{ color: "#A0AEC0" }}
             initial={{ opacity: 0, y: 20 }}
             animate={entered ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.44 }}
+            transition={{ duration: 0.7, delay: 0.45 }}
           >
-            Ocean vibes, tropical energy, and the freshest ingredients on the island.
+            Ocean vibes, tropical energy, and the freshest ingredients — crafted fresh to order.
           </motion.p>
 
+          {/* CTAs */}
           <motion.div
-            className="flex gap-4 flex-wrap"
+            className="flex gap-3 flex-wrap"
             initial={{ opacity: 0, y: 20 }}
             animate={entered ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.57 }}
+            transition={{ duration: 0.7, delay: 0.58 }}
           >
             <button
               onClick={() => document.getElementById("builder")?.scrollIntoView({ behavior: "smooth" })}
               data-testid="button-build-bowl"
-              className="px-8 py-4 rounded-full font-bold text-lg text-white transition-all duration-300 hover:scale-105 active:scale-95"
-              style={{ background: "linear-gradient(135deg,#FF6B47,#e8381a)", boxShadow: "0 0 28px rgba(255,107,71,0.35)" }}
+              className="px-8 py-4 rounded-full font-bold text-base text-white transition-all duration-300 hover:scale-[1.03] active:scale-95"
+              style={{ background: "#F26522", boxShadow: "0 0 24px rgba(242,101,34,0.35)" }}
             >
-              Build Your Bowl
+              Order Now
             </button>
             <button
               onClick={() => document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" })}
               data-testid="button-see-menu"
-              className="px-8 py-4 rounded-full font-bold text-lg border border-foreground/20 text-foreground/70 hover:border-primary hover:text-primary transition-all duration-300"
+              className="px-8 py-4 rounded-full font-bold text-base transition-all duration-300 hover:scale-[1.03]"
+              style={{ border: "1px solid rgba(255,255,255,0.15)", color: "#A0AEC0" }}
             >
               Our Menu
             </button>
           </motion.div>
 
-          {/* Active bowl label */}
+          {/* Nav text "Previous · Next" style */}
+          <motion.div
+            className="flex gap-6 pt-2"
+            initial={{ opacity: 0 }}
+            animate={entered ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.7 }}
+          >
+            <button
+              onClick={() => navigate((active - 1 + BOWLS.length) % BOWLS.length)}
+              className="text-sm font-semibold flex items-center gap-2 transition-colors"
+              style={{ color: "#A0AEC0" }}
+              data-testid="button-prev-text"
+            >
+              <span style={{ display: "inline-block", width: 20, height: 1, background: "#F26522", verticalAlign: "middle" }} />
+              Previous
+            </button>
+            <button
+              onClick={() => navigate((active + 1) % BOWLS.length)}
+              className="text-sm font-semibold flex items-center gap-2 transition-colors"
+              style={{ color: "#A0AEC0" }}
+              data-testid="button-next-text"
+            >
+              Next
+              <span style={{ display: "inline-block", width: 20, height: 1, background: "#F26522", verticalAlign: "middle" }} />
+            </button>
+          </motion.div>
+
+          {/* Active bowl label + price */}
           <AnimatePresence mode="wait">
             <motion.div
-              key={active + "-label"}
+              key={active + "-lbl"}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.28 }}
-              className="pt-2 space-y-0.5"
             >
-              <p className="font-display font-bold text-2xl text-foreground" data-testid="text-bowl-name">
+              <p className="font-display font-bold text-2xl text-white" data-testid="text-bowl-name">
                 {BOWLS[active].name}
               </p>
-              <p className="text-foreground/45 text-sm" data-testid="text-bowl-tagline">
+              <p className="text-sm mt-0.5" style={{ color: "#A0AEC0" }} data-testid="text-bowl-tagline">
                 {BOWLS[active].tagline}
               </p>
-              <p className="font-bold text-primary text-lg mt-1" data-testid="text-bowl-price">
+              <p className="font-bold text-xl mt-1" style={{ color: "#F26522" }} data-testid="text-bowl-price">
                 {BOWLS[active].price}
               </p>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* ── Orbital carousel column ──────────────────────────────────────── */}
-        <div className="relative" style={{ height: "min(600px, 80vh)" }}>
-          {/* SVG container that defines the orbital space */}
+        {/* ── Right: Orbital carousel ──────────────────────────────────────── */}
+        <div className="relative" style={{ height: "min(620px, 82vh)" }}>
+          {/* SVG arc track */}
           <svg
             viewBox="0 0 700 600"
             className="absolute inset-0 w-full h-full"
             style={{ overflow: "visible" }}
             aria-hidden="true"
           >
-            {/* Dotted orbital track */}
             <path
               d={ARC_PATH}
               fill="none"
-              stroke="rgba(155,227,106,0.22)"
+              stroke="#F26522"
+              strokeOpacity="0.35"
               strokeWidth="1.5"
-              strokeDasharray="6 10"
+              strokeDasharray="6 8"
               strokeLinecap="round"
             />
-            {/* Track dots at slot positions */}
             {SLOTS.slice(1).map((s, i) => (
-              <circle key={i} cx={s.x} cy={s.y} r="4" fill="rgba(155,227,106,0.3)" />
+              <circle key={i} cx={s.x} cy={s.y} r="3.5" fill="#F26522" fillOpacity="0.3" />
             ))}
           </svg>
 
-          {/* ── Active (main) bowl — Layer 2 (z:10) ── */}
+          {/* ── Active bowl — Layer 2 (z:10), spring spin-in/out ── */}
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={BOWLS[active].id + "-main"}
               custom={direction}
               className="absolute"
               style={{
-                width: 300,
-                height: 300,
+                width: 320, height: 320,
                 left: SLOTS[0].x / 700 * 100 + "%",
                 top:  SLOTS[0].y / 600 * 100 + "%",
                 transform: "translate(-50%, -50%)",
                 zIndex: 10,
               }}
               variants={{
-                enter: (dir: number) => ({
-                  rotate: dir * 360,
-                  scale: 0.5,
-                  opacity: 0,
-                  x: dir * 80,
-                  y: dir * 60,
-                }),
+                enter: (dir: number) => ({ rotate: dir * 360, scale: 0.5, opacity: 0, x: dir * 80, y: dir * 60 }),
                 center: { rotate: 0, scale: 1, opacity: 1, x: 0, y: 0 },
-                exit:  (dir: number) => ({
-                  rotate: dir * -360,
-                  scale: 0,
-                  opacity: 0,
-                  x: dir * -80,
-                  y: dir * -60,
-                }),
+                exit:  (dir: number) => ({ rotate: dir * -360, scale: 0, opacity: 0, x: dir * -80, y: dir * -60 }),
               }}
               initial="enter"
               animate="center"
@@ -305,86 +286,71 @@ export function Hero() {
               <motion.img
                 src={BOWLS[active].image}
                 alt={BOWLS[active].name}
-                className="w-full h-full object-cover rounded-full"
-                style={{ filter: "drop-shadow(0 28px 56px rgba(0,0,0,0.55))" }}
+                className="w-full h-full object-contain"
+                style={{ filter: "drop-shadow(0 32px 64px rgba(0,0,0,0.7))" }}
                 animate={{ y: [-12, 12, -12] }}
                 transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
                 data-testid={`img-hero-bowl-${BOWLS[active].id}`}
               />
-
-              {/* Price tag floating on bowl */}
+              {/* Price tag */}
               <motion.div
-                className="absolute -top-3 -right-3 px-3 py-1.5 rounded-full font-bold text-sm"
-                style={{ background: "#FF6B47", color: "#fff", boxShadow: "0 4px 16px rgba(255,107,71,0.5)" }}
+                className="absolute -top-2 -right-2 px-3 py-1.5 rounded-full font-bold text-sm text-white"
+                style={{ background: "#F26522", boxShadow: "0 4px 14px rgba(242,101,34,0.5)" }}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.3, type: "spring", stiffness: 400, damping: 20 }}
+                transition={{ delay: 0.25, type: "spring", stiffness: 400, damping: 20 }}
               >
                 {BOWLS[active].price}
               </motion.div>
             </motion.div>
           </AnimatePresence>
 
-          {/* ── Thumbnail bowls sliding along the arc ── */}
+          {/* ── Thumbnail bowls on arc ── */}
           {thumbBowls.map((bowl, tIdx) => {
-            const slot = tIdx + 1; // slots 1-3 (we only have 3 thumbs for 4 bowls)
+            const slot = tIdx + 1;
             if (slot >= SLOTS.length) return null;
             const pos = SLOTS[slot];
-            const sz = THUMB_SIZES[slot];
+            const sz = slot <= 2 ? 80 : 80;
+            const isHighlight = slot === 1;
             return (
               <motion.button
                 key={bowl.id + "-thumb"}
-                className="absolute rounded-full overflow-hidden border-2 border-foreground/10 hover:border-primary/60 transition-colors"
+                className="absolute rounded-full overflow-hidden transition-all"
                 style={{
-                  width: sz,
-                  height: sz,
+                  width: sz, height: sz,
                   left: pos.x / 700 * 100 + "%",
                   top: pos.y / 600 * 100 + "%",
                   transform: "translate(-50%, -50%)",
                   zIndex: 8,
+                  border: isHighlight ? "2px solid #F26522" : "2px solid #1A2432",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+                  background: "#1A2432",
                 }}
                 onClick={() => navigate(BOWLS.indexOf(bowl))}
                 initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ ...SPRING, delay: 0.1 * tIdx }}
-                whileHover={{ scale: 1.15, borderColor: "#FF6B47" }}
+                animate={{ opacity: 1, scale: isHighlight ? 1.15 : 1 }}
+                transition={{ ...SPRING, delay: 0.08 * tIdx }}
+                whileHover={{ scale: 1.18, borderColor: "#F26522" }}
                 data-testid={`button-bowl-thumb-${bowl.id}`}
               >
-                <img src={bowl.image} alt={bowl.name} className="w-full h-full object-cover" />
+                <img src={bowl.image} alt={bowl.name} className="w-full h-full object-contain" />
               </motion.button>
             );
           })}
 
-          {/* Navigation arrows */}
-          <button
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-foreground/20 text-foreground/50 hover:border-primary hover:text-primary flex items-center justify-center transition-all bg-background/40 backdrop-blur-sm"
-            style={{ zIndex: 20 }}
-            onClick={() => navigate((active - 1 + BOWLS.length) % BOWLS.length)}
-            data-testid="button-bowl-prev"
-          >
-            &#8592;
-          </button>
-          <button
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-foreground/20 text-foreground/50 hover:border-primary hover:text-primary flex items-center justify-center transition-all bg-background/40 backdrop-blur-sm"
-            style={{ zIndex: 20 }}
-            onClick={() => navigate((active + 1) % BOWLS.length)}
-            data-testid="button-bowl-next"
-          >
-            &#8594;
-          </button>
-
           {/* Dot pagination */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2" style={{ zIndex: 20 }}>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-2" style={{ zIndex: 20 }}>
             {BOWLS.map((_, i) => (
-              <button
+              <motion.button
                 key={i}
                 onClick={() => navigate(i)}
-                className="rounded-full transition-all duration-300"
-                style={{
-                  width: i === active ? 24 : 8,
-                  height: 8,
-                  background: i === active ? "#FF6B47" : "rgba(248,244,236,0.25)",
+                className="rounded-full"
+                animate={{
+                  width: i === active ? 22 : 7,
+                  background: i === active ? "#F26522" : "rgba(255,255,255,0.2)",
                 }}
+                style={{ height: 7 }}
+                transition={{ duration: 0.3 }}
                 data-testid={`button-dot-${i}`}
               />
             ))}
@@ -392,18 +358,26 @@ export function Hero() {
         </div>
       </div>
 
-      {/* ── Layer 3 (FRONT of bowl): debris that overlaps ───────────────────── */}
-      {DEBRIS.filter(d => !d.zBehind).map((d) => (
+      {/* ── Front leaves (z:20 — pass over bowl) ─────────────────────────── */}
+      {LEAVES.filter(l => l.z === 20).map((l) => (
         <motion.div
-          key={d.id}
+          key={l.id}
           className="absolute pointer-events-none"
-          style={{ top: d.top, left: d.left, zIndex: 20 }}
-          animate={{ y: [0, -20 * d.parallax, 0], rotate: [0, d.rotRange, 0] }}
-          transition={{ duration: d.dur, delay: d.delay, repeat: Infinity, ease: "easeInOut" }}
+          style={{ top: l.top, left: (l as any).left, right: (l as any).right, zIndex: 20 }}
+          animate={{ x: [0, l.tx, 0], y: [0, l.ty, 0], rotate: [0, l.rot, 0] }}
+          transition={{ duration: l.dur, delay: l.delay, repeat: Infinity, ease: "easeInOut", repeatType: "mirror" }}
         >
-          <DebrisSvg shape={d.shape} color={d.color} w={d.w} h={d.h} />
+          <LeafSvg w={l.w} />
         </motion.div>
       ))}
+
+      {/* "Stay healthy · Stay fresh" bottom text */}
+      <div
+        className="absolute bottom-6 left-6 text-xs font-medium tracking-widest uppercase"
+        style={{ color: "#A0AEC0", opacity: 0.6, zIndex: 10 }}
+      >
+        Stay Fresh · Stay Healthy
+      </div>
     </section>
   );
 }

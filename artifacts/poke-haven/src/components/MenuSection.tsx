@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-/* ─── Menu data (from PDF — Haven Poke menu) ─────────────────────────────── */
+/* ─── Full menu from PDF ───────────────────────────────────────────────────── */
 const CATEGORIES = [
   {
     id: "signature",
@@ -11,184 +11,223 @@ const CATEGORIES = [
         id: "haven-speciaal",
         name: "Haven Speciaal",
         price: "€16.50",
-        image: "/bowl-haven-speciaal.webp",
+        image: "/bowl-haven.png",
         tag: "Chef's Pick",
-        tagColor: "#FF6B47",
-        desc: "Tuna, salmon, crab surimi, avocado, tobiko, seaweed salad, sesame seeds",
-        cal: "620 kcal",
+        desc: "Tuna, salmon, crab surimi, avocado, tobiko, zeewierssalade, sesam",
+        rating: 4.9,
       },
       {
         id: "garnalen",
         name: "Poke Garnalen",
         price: "€15.50",
-        image: "/bowl-garnalen.webp",
+        image: "/bowl-garnalen-png.png",
         tag: "Popular",
-        tagColor: "#9BE36A",
-        desc: "King prawns, edamame, radish, red onion, seaweed salad, spicy mayo",
-        cal: "540 kcal",
+        desc: "Garnalen, edamame, radijs, rode ui, zeewierssalade, spicy mayo",
+        rating: 4.8,
       },
       {
         id: "shoyu-tofu",
         name: "Shoyu Tofu",
         price: "€13.50",
-        image: "/bowl-shoyu-tofu.webp",
+        image: "/bowl-tofu.png",
         tag: "Vegan",
-        tagColor: "#9BE36A",
-        desc: "Crispy tofu, sweetcorn, cucumber, avocado, cherry tomato, shoyu dressing",
-        cal: "480 kcal",
+        desc: "Krokante tofu, maïs, komkommer, avocado, cherrytomaat, shoyu",
+        rating: 4.7,
       },
       {
         id: "vlees-speciaal",
         name: "Vlees Speciaal",
         price: "€17.50",
-        image: "/bowl-vlees-speciaal.webp",
+        image: "/bowl-vlees.png",
         tag: "New",
-        tagColor: "#FF6B47",
-        desc: "Marinated beef strips, cherry tomato, bell pepper, red onion, carrot, sesame",
-        cal: "680 kcal",
+        desc: "Gemarineerd rund, cherrytomaat, paprika, rode ui, wortel, sesam",
+        rating: 4.9,
       },
     ],
   },
   {
     id: "classic",
-    label: "Classic Bowls",
+    label: "Klassieke Bowls",
     items: [
       {
-        id: "ahi-tuna",
-        name: "Ahi Tuna",
+        id: "tuna",
+        name: "Poke Tuna",
         price: "€14.50",
-        image: "/bowl-haven-speciaal.webp",
+        image: "/bowl-tuna.webp",
         tag: null,
-        tagColor: "",
-        desc: "Yellowfin tuna, sweet onion, cucumber, edamame, shoyu ponzu",
-        cal: "490 kcal",
+        desc: "Yellowfin tonijn, komkommer, edamame, zeewier, ponzu-shoyu",
+        rating: 4.8,
       },
       {
-        id: "salmon-classic",
-        name: "Atlantic Salmon",
+        id: "zalim",
+        name: "Poke Zalm",
         price: "€14.50",
-        image: "/bowl-garnalen.webp",
+        image: "/bowl-zalim.webp",
         tag: "Bestseller",
-        tagColor: "#FF6B47",
-        desc: "Fresh salmon, mango, avocado, crispy onion, sesame ginger sauce",
-        cal: "560 kcal",
+        desc: "Verse zalm, avocado, edamame, wortel, sesamdressing",
+        rating: 4.9,
       },
       {
-        id: "spicy-tuna",
-        name: "Spicy Tuna",
-        price: "€14.50",
-        image: "/bowl-haven-speciaal.webp",
-        tag: null,
-        tagColor: "",
-        desc: "Spicy marinated tuna, jalapeño, spring onion, sriracha mayo, tobiko",
-        cal: "510 kcal",
-      },
-      {
-        id: "chicken-teriyaki",
-        name: "Chicken Teriyaki",
+        id: "falafel",
+        name: "Poke Falafel",
         price: "€13.00",
-        image: "/bowl-vlees-speciaal.webp",
+        image: "/bowl-falafel.webp",
+        tag: "Vegan",
+        desc: "Krokante falafel, edamame, maïs, avocado, lente-ui, sriracha",
+        rating: 4.7,
+      },
+      {
+        id: "kip",
+        name: "Warm Crispy Kip",
+        price: "€14.00",
+        image: "/bowl-kip.webp",
         tag: null,
-        tagColor: "",
-        desc: "Teriyaki chicken, pineapple, edamame, cucumber, teriyaki glaze",
-        cal: "520 kcal",
+        desc: "Krokante kip, mango, komkommer, rode ui, spicy mayo",
+        rating: 4.6,
       },
     ],
   },
   {
     id: "drinks",
-    label: "Drinks & Sides",
+    label: "Dranken",
     items: [
       {
-        id: "mango-lemonade",
-        name: "Mango Lemonade",
-        price: "€4.00",
-        image: "/bowl-garnalen.webp",
-        tag: "Favourite",
-        tagColor: "#9BE36A",
-        desc: "Fresh mango, lemon juice, sparkling water, mint",
-        cal: "120 kcal",
+        id: "smoothie-rood",
+        name: "Rode Smoothie",
+        price: "€5.50",
+        image: "/bowl-garnalen-png.png",
+        tag: "Fresh",
+        desc: "Rode appel, aardbei, bosbes, braambes, framboos",
+        rating: 4.8,
       },
       {
-        id: "coconut-water",
-        name: "Coconut Water",
-        price: "€3.50",
-        image: "/bowl-shoyu-tofu.webp",
+        id: "smoothie-geel",
+        name: "Gele Smoothie",
+        price: "€5.50",
+        image: "/bowl-tofu.png",
+        tag: "Fresh",
+        desc: "Banaan, ananas, mango",
+        rating: 4.7,
+      },
+      {
+        id: "cola",
+        name: "Frisdranken",
+        price: "€2.90",
+        image: "/bowl-falafel.webp",
         tag: null,
-        tagColor: "",
-        desc: "100% natural coconut water, chilled",
-        cal: "65 kcal",
+        desc: "Coca-Cola, Coca-Cola Zero, Fanta Orange, Fanta Lemon, Sprite, Lipton Ice Tea",
+        rating: 4.5,
       },
       {
-        id: "edamame",
-        name: "Edamame",
-        price: "€3.50",
-        image: "/bowl-shoyu-tofu.webp",
+        id: "koffie",
+        name: "Warme Dranken",
+        price: "v.a. €2.50",
+        image: "/bowl-kip.webp",
+        tag: null,
+        desc: "Espresso, Americano, Cappuccino, Latte, Zwarte/Groene/Muntthee",
+        rating: 4.6,
+      },
+    ],
+  },
+  {
+    id: "desserts",
+    label: "Ijs & Desserts",
+    items: [
+      {
+        id: "vanille",
+        name: "Vanille Coupe",
+        price: "€7.00",
+        image: "/bowl-tofu.png",
+        tag: "Sweet",
+        desc: "Vanille-ijs met chocoladesaus en slagroom",
+        rating: 4.8,
+      },
+      {
+        id: "brazilliana",
+        name: "Brazilliana",
+        price: "€8.00",
+        image: "/bowl-haven.png",
+        tag: "Popular",
+        desc: "Met karamel en gekarameliseerde noten",
+        rating: 4.9,
+      },
+      {
+        id: "citroensorbet",
+        name: "Citroensorbet",
+        price: "€6.00",
+        image: "/bowl-garnalen-png.png",
         tag: "Vegan",
-        tagColor: "#9BE36A",
-        desc: "Steamed edamame with sea salt and sesame oil",
-        cal: "140 kcal",
+        desc: "Fris citroensorbet",
+        rating: 4.7,
       },
       {
-        id: "miso-soup",
-        name: "Miso Soup",
-        price: "€3.00",
-        image: "/bowl-shoyu-tofu.webp",
+        id: "taart",
+        name: "Taart van de Dag",
+        price: "€6.00",
+        image: "/bowl-vlees.png",
         tag: null,
-        tagColor: "",
-        desc: "Traditional white miso, tofu, wakame, spring onion",
-        cal: "80 kcal",
+        desc: "Vraag naar de dagelijkse selectie",
+        rating: 4.8,
       },
     ],
   },
 ];
 
-const stagger = {
-  container: { animate: { transition: { staggerChildren: 0.08 } } },
-  item: {
-    initial: { opacity: 0, y: 32 },
-    animate: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
-  },
+const TAG_COLOR: Record<string, string> = {
+  "Chef's Pick": "#F26522",
+  Popular: "#F26522",
+  New: "#F26522",
+  Bestseller: "#F26522",
+  Vegan: "#59B259",
+  Fresh: "#59B259",
+  Sweet: "#F26522",
 };
+
+function Stars({ n }: { n: number }) {
+  return (
+    <span className="flex items-center gap-0.5">
+      {[1,2,3,4,5].map(i => (
+        <svg key={i} width="11" height="11" viewBox="0 0 12 12">
+          <path d="M6 1l1.4 2.8 3.1.4-2.25 2.2.53 3.1L6 8.1l-2.78 1.4.53-3.1L1.5 4.2l3.1-.4z"
+            fill={i <= Math.round(n) ? "#F26522" : "rgba(255,255,255,0.15)"} />
+        </svg>
+      ))}
+      <span className="text-xs ml-1" style={{ color: "#A0AEC0" }}>{n}</span>
+    </span>
+  );
+}
 
 export function MenuSection() {
   const [activeCat, setActiveCat] = useState("signature");
-  const cat = CATEGORIES.find((c) => c.id === activeCat)!;
+  const cat = CATEGORIES.find(c => c.id === activeCat)!;
 
   return (
-    <section id="menu" className="py-28 relative overflow-hidden" style={{ background: "hsl(210 45% 12%)" }}>
-      {/* Subtle background glow */}
-      <div
-        className="absolute top-0 right-0 w-[40vw] h-[40vw] pointer-events-none"
-        style={{ background: "radial-gradient(circle, rgba(155,227,106,0.05) 0%, transparent 70%)" }}
-      />
+    <section id="menu" className="py-28 relative overflow-hidden" style={{ background: "#0E1621" }}>
+      {/* Orange separator line from spec */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "rgba(242,101,34,0.2)" }} />
 
       <div className="container mx-auto px-6">
         {/* Header */}
         <motion.div
-          className="mb-14"
+          className="text-center mb-14"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         >
-          <p className="text-sm font-bold tracking-[0.22em] uppercase mb-3" style={{ color: "#FF6B47" }}>
-            Our Menu
-          </p>
-          <h2
-            className="font-display font-black text-foreground tracking-tight leading-none"
-            style={{ fontSize: "clamp(2.5rem, 5.5vw, 5rem)" }}
-          >
-            Fresh Every Day
+          <h2 className="font-display font-black tracking-tight leading-none" style={{ fontSize: "clamp(2.5rem, 5.5vw, 5rem)" }}>
+            <span style={{ color: "#fff" }}>Ons </span>
+            <span style={{ color: "#F26522" }}>Populair </span>
+            <span style={{ color: "#fff" }}>Menu</span>
           </h2>
-          <p className="text-foreground/45 text-lg mt-4 max-w-lg">
-            Every bowl is crafted to order with the freshest catch and seasonal produce.
+          <p className="mt-4 text-base max-w-md mx-auto" style={{ color: "#A0AEC0" }}>
+            Elke bowl vers bereid met de lekkerste ingrediënten — dagelijks geleverd.
           </p>
         </motion.div>
 
-        {/* Category tabs */}
+        {/* Category filter tabs */}
         <motion.div
-          className="flex gap-2 mb-12 flex-wrap"
+          className="flex gap-2 justify-center mb-12 flex-wrap"
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -198,12 +237,22 @@ export function MenuSection() {
             <button
               key={c.id}
               onClick={() => setActiveCat(c.id)}
-              data-testid={`tab-menu-${c.id}`}
+              data-testid={`tab-${c.id}`}
               className="px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-300"
               style={{
-                background: activeCat === c.id ? "#FF6B47" : "rgba(248,244,236,0.06)",
-                color: activeCat === c.id ? "#fff" : "rgba(248,244,236,0.55)",
-                border: `1px solid ${activeCat === c.id ? "#FF6B47" : "rgba(248,244,236,0.1)"}`,
+                background: activeCat === c.id ? "#F26522" : "#1A2432",
+                color: activeCat === c.id ? "#fff" : "#A0AEC0",
+                border: `1px solid ${activeCat === c.id ? "#F26522" : "rgba(255,255,255,0.08)"}`,
+              }}
+              onMouseEnter={(e) => {
+                if (activeCat !== c.id) {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(242,101,34,0.5)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (activeCat !== c.id) {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,0.08)";
+                }
               }}
             >
               {c.label}
@@ -211,121 +260,104 @@ export function MenuSection() {
           ))}
         </motion.div>
 
-        {/* Cards grid */}
+        {/* Cards */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCat}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"
-            variants={stagger.container}
-            initial="initial"
-            animate="animate"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+            initial="hidden"
+            animate="show"
             exit={{ opacity: 0 }}
+            variants={{ show: { transition: { staggerChildren: 0.12 } }, hidden: {} }}
           >
             {cat.items.map((item) => (
               <motion.div
                 key={item.id}
-                variants={stagger.item}
-                data-testid={`card-menu-${item.id}`}
-                className="group relative rounded-2xl overflow-hidden cursor-pointer flex flex-col"
+                data-testid={`card-${item.id}`}
+                className="relative flex flex-col cursor-pointer"
                 style={{
-                  background: "hsl(210 51% 11%)",
-                  border: "1px solid rgba(248,244,236,0.07)",
+                  background: "#1A2432",
+                  border: "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: 16,
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+                }}
+                variants={{
+                  hidden: { opacity: 0, y: 40 },
+                  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
                 }}
                 whileHover={{
                   y: -6,
-                  boxShadow: "0 20px 44px -10px rgba(255,107,71,0.16)",
-                  borderColor: "rgba(255,107,71,0.3)",
+                  boxShadow: "0 20px 48px rgba(0,0,0,0.45)",
+                  borderColor: "#F26522",
+                  transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] },
                 }}
-                transition={{ duration: 0.25 }}
               >
-                {/* Bowl image — hover: scale 10% + rotate ~7° */}
-                <div className="relative aspect-square bg-foreground/5 flex items-center justify-center overflow-hidden p-3">
+                {/* Tag */}
+                {item.tag && (
+                  <div
+                    className="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full z-10"
+                    style={{
+                      background: (TAG_COLOR[item.tag] || "#F26522") + "22",
+                      color: TAG_COLOR[item.tag] || "#F26522",
+                      border: `1px solid ${(TAG_COLOR[item.tag] || "#F26522")}44`,
+                    }}
+                    data-testid={`badge-${item.id}`}
+                  >
+                    {item.tag}
+                  </div>
+                )}
+
+                {/* Image — circular, slightly overlapping top, hover: scale 10% + rotate ~7° */}
+                <div className="flex justify-center pt-6 pb-2 overflow-hidden">
                   <motion.img
                     src={item.image}
                     alt={item.name}
-                    className="w-[82%] h-[82%] object-cover rounded-full"
-                    style={{ filter: "drop-shadow(0 10px 24px rgba(0,0,0,0.45))" }}
+                    className="object-contain rounded-full"
+                    style={{ width: 110, height: 110, background: "rgba(255,255,255,0.04)" }}
                     whileHover={{ scale: 1.1, rotate: 7 }}
                     transition={{ duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
-                    data-testid={`img-menu-${item.id}`}
+                    data-testid={`img-${item.id}`}
                   />
-                  {/* Tag badge */}
-                  {item.tag && (
-                    <div
-                      className="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full"
-                      style={{
-                        background: item.tagColor + "22",
-                        color: item.tagColor,
-                        border: `1px solid ${item.tagColor}44`,
-                      }}
-                      data-testid={`badge-${item.id}`}
-                    >
-                      {item.tag}
-                    </div>
-                  )}
                 </div>
 
-                {/* Info */}
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="flex justify-between items-start mb-1.5">
-                    <h3 className="font-display font-bold text-base text-foreground leading-tight pr-2">
-                      {item.name}
-                    </h3>
-                    <span className="font-bold text-sm shrink-0" style={{ color: "#FF6B47" }}>
-                      {item.price}
-                    </span>
+                <div className="p-4 flex flex-col flex-1">
+                  <h3 className="font-display font-bold text-white text-sm mb-1">{item.name}</h3>
+                  <Stars n={item.rating} />
+                  <p className="text-xs mt-2 leading-relaxed flex-1" style={{ color: "#A0AEC0" }}>{item.desc}</p>
+
+                  <div className="flex items-center justify-between mt-4">
+                    <span className="font-bold text-white text-sm">{item.price}</span>
+                    {/* Add to cart — leaf green button */}
+                    <motion.button
+                      className="px-4 py-2 rounded-full font-bold text-xs text-white flex items-center gap-1"
+                      style={{ background: "#59B259" }}
+                      whileHover={{ background: "#48BB78", scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      data-testid={`button-add-${item.id}`}
+                    >
+                      + Bestellen
+                    </motion.button>
                   </div>
-
-                  <p className="text-foreground/40 text-xs leading-relaxed mb-1 flex-1">{item.desc}</p>
-                  <p className="text-foreground/25 text-xs mb-4">{item.cal}</p>
-
-                  {/* Add to Order — lime green, high contrast on hover */}
-                  <motion.button
-                    className="w-full py-2.5 rounded-full font-bold text-xs transition-all duration-300"
-                    style={{
-                      background: "rgba(155,227,106,0.1)",
-                      color: "#9BE36A",
-                      border: "1px solid rgba(155,227,106,0.22)",
-                    }}
-                    whileHover={{
-                      background: "#9BE36A",
-                      color: "#0D1B2A",
-                      boxShadow: "0 0 18px rgba(155,227,106,0.3)",
-                      scale: 1.02,
-                    }}
-                    whileTap={{ scale: 0.96 }}
-                    data-testid={`button-add-${item.id}`}
-                  >
-                    Add to Order
-                  </motion.button>
                 </div>
               </motion.div>
             ))}
           </motion.div>
         </AnimatePresence>
 
-        {/* Extended menu note */}
+        {/* Explore More button */}
         <motion.div
-          className="mt-16 flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-2xl"
-          style={{ background: "rgba(255,107,71,0.07)", border: "1px solid rgba(255,107,71,0.15)" }}
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          className="flex justify-center mt-14"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.55 }}
+          transition={{ duration: 0.5 }}
         >
-          <div>
-            <h3 className="font-display font-bold text-2xl text-foreground mb-1">All bowls are customisable</h3>
-            <p className="text-foreground/50 text-sm max-w-md">
-              Choose your base (white rice, brown rice, mixed greens, or zoodles), protein, toppings, and sauce. Starting from €12.50.
-            </p>
-          </div>
           <button
-            onClick={() => document.getElementById("builder")?.scrollIntoView({ behavior: "smooth" })}
-            data-testid="button-build-from-menu"
-            className="shrink-0 px-7 py-3.5 rounded-full font-bold text-base text-white transition-all duration-300 hover:scale-105"
-            style={{ background: "linear-gradient(135deg,#FF6B47,#e8381a)", boxShadow: "0 0 22px rgba(255,107,71,0.3)" }}
+            className="px-10 py-4 rounded-full font-bold text-white transition-all duration-300 hover:scale-[1.03]"
+            style={{ background: "#F26522", boxShadow: "0 0 20px rgba(242,101,34,0.3)" }}
+            data-testid="button-explore-more"
           >
-            Build Your Own
+            Meer Bekijken
           </button>
         </motion.div>
       </div>

@@ -71,45 +71,45 @@
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
 
-  /* Deep navy */
-  --background: 210 51% 11%;
-  /* Cream */
-  --foreground: 40 50% 96%;
+  /* Deep Navy #0E1621 */
+  --background: 215 40% 9%;
+  /* White */
+  --foreground: 0 0% 100%;
 
-  /* Navy border */
-  --border: 210 30% 25%;
-  --input: 210 30% 25%;
-  --ring: 14 100% 64%; /* Coral ring */
+  /* Border */
+  --border: 215 13% 20%;
+  --input: 215 13% 20%;
+  --ring: 19 89% 54%;
 
-  /* Cards */
-  --card: 210 45% 15%;
-  --card-foreground: 40 50% 96%;
-  --card-border: 210 30% 25%;
+  /* Dark Surface #1A2432 */
+  --card: 215 32% 15%;
+  --card-foreground: 0 0% 100%;
+  --card-border: 215 13% 20%;
 
-  --sidebar: 210 45% 15%;
-  --sidebar-foreground: 40 50% 96%;
-  --sidebar-border: 210 30% 25%;
-  --sidebar-primary: 14 100% 64%;
-  --sidebar-primary-foreground: 40 50% 96%;
-  --sidebar-accent: 210 30% 20%;
-  --sidebar-accent-foreground: 40 50% 96%;
-  --sidebar-ring: 14 100% 64%;
+  --sidebar: 215 32% 15%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-border: 215 13% 20%;
+  --sidebar-primary: 19 89% 54%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 215 13% 20%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-ring: 19 89% 54%;
 
-  --popover: 210 45% 15%;
-  --popover-foreground: 40 50% 96%;
-  --popover-border: 210 30% 25%;
+  --popover: 215 32% 15%;
+  --popover-foreground: 0 0% 100%;
+  --popover-border: 215 13% 20%;
 
-  /* Coral */
-  --primary: 14 100% 64%;
-  --primary-foreground: 210 51% 11%;
+  /* Deep Orange #F26522 */
+  --primary: 19 89% 54%;
+  --primary-foreground: 0 0% 100%;
 
-  /* Lime */
-  --secondary: 95 68% 65%;
-  --secondary-foreground: 210 51% 11%;
+  /* Leaf Green #59B259 */
+  --secondary: 120 37% 52%;
+  --secondary-foreground: 0 0% 100%;
 
-  /* Muted navy */
-  --muted: 210 30% 20%;
-  --muted-foreground: 210 20% 70%;
+  /* Muted */
+  --muted: 215 13% 20%;
+  --muted-foreground: 214 20% 69%;
 
   /* Accent */
   --accent: 210 30% 20%;
