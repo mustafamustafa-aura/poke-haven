@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 /* ─── Signature bowls ─────────────────────────────────────────────────────── */
 const SIGNATURE = [
-  { id: "crispy-kip",    name: "Warm Crispy Kip",       price: "€13.90", image: "/bowl-kip-new.png",        tag: "Bestseller", desc: "Sushirijst, krokante kip, srirachamayo, rode ui, mango, komkommer, avocado, gefrituurde ui, bamiye, Japanse crunch, bosui", rating: 4.8 },
   { id: "zalm",          name: "Poke Zalm",             price: "€13.90", image: "/bowl-zalim-new.png",       tag: "Populair",   desc: "Sushirijst, zalm, srirachamayo, wakame, wasabimayo, rode ui, komkommer, edamame, wasabi, gefrituurde ui, bosui", rating: 4.9 },
   { id: "tuna",          name: "Poke Tuna",             price: "€13.90", image: "/bowl-tuna-new.png",        tag: null,         desc: "Sushirijst, srirachamayo, wasabimayo, wakame, rode ui, komkommer, edamame, tonijn, jalapeños, wasabi crunch, bosui", rating: 4.7 },
   { id: "falafel",       name: "Poke Falafel",          price: "€13.90", image: "/bowl-falafel-new.png",     tag: "Vegan",      desc: "Bruine rijst, salademix, srirachamayo, falafel, maïs, paprika, edamame, avocado, gefrituurde ui, bosui", rating: 4.7 },
