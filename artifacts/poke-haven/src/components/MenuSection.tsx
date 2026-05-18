@@ -98,8 +98,8 @@ function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
             alt={item.name}
             className="object-contain"
             style={{ width: 110, height: 110, background: "transparent" }}
-            whileHover={{ scale: 1.1, rotate: 7 }}
-            transition={{ duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
+            whileHover={{ scale: 1.06, rotate: 3, y: -4 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           />
         ) : (
           <div

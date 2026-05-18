@@ -20,14 +20,14 @@ const arcEnd   = pt(113);
 const ARC_PATH = `M ${arcStart.x.toFixed(1)} ${arcStart.y.toFixed(1)} A ${OR} ${OR} 0 0 0 ${arcEnd.x.toFixed(1)} ${arcEnd.y.toFixed(1)}`;
 
 const LEAVES = [
-  { id: 1, w: 52, top: "9%",  left: "5%",  z: 5,  dur: 7.5, delay: 0,    rot: 18,  tx: 40, ty: -30 },
-  { id: 2, w: 36, top: "22%", left: "2%",  z: 20, dur: 9.0, delay: -3,   rot: -22, tx: 25, ty: -50 },
-  { id: 3, w: 28, top: "58%", left: "3%",  z: 5,  dur: 8.2, delay: -5,   rot: 15,  tx: 35, ty: -40 },
-  { id: 4, w: 20, top: "75%", left: "6%",  z: 20, dur: 6.8, delay: -1.5, rot: -14, tx: 20, ty: -35 },
-  { id: 5, w: 44, top: "86%", left: "2%",  z: 5,  dur: 10,  delay: -7,   rot: 20,  tx: 45, ty: -25 },
-  { id: 6, w: 30, top: "42%", left: "1%",  z: 20, dur: 8.5, delay: -4,   rot: -18, tx: 30, ty: -45 },
-  { id: 7, w: 24, top: "35%", right: "4%", z: 5,  dur: 7.2, delay: -2,   rot: 16,  tx: -30, ty: -35 },
-  { id: 8, w: 38, top: "65%", right: "3%", z: 20, dur: 9.5, delay: -6,   rot: -20, tx: -40, ty: -28 },
+  { id: 1, w: 52, top: "9%",  left: "5%",  z: 5,  dur: 8.5, delay: 0,    rot: 8,   tx: 18, ty: -14 },
+  { id: 2, w: 36, top: "22%", left: "2%",  z: 20, dur: 10,  delay: -3,   rot: -10, tx: 12, ty: -22 },
+  { id: 3, w: 28, top: "58%", left: "3%",  z: 5,  dur: 9.2, delay: -5,   rot: 7,   tx: 16, ty: -18 },
+  { id: 4, w: 20, top: "75%", left: "6%",  z: 20, dur: 7.8, delay: -1.5, rot: -6,  tx: 10, ty: -14 },
+  { id: 5, w: 44, top: "86%", left: "2%",  z: 5,  dur: 11,  delay: -7,   rot: 9,   tx: 20, ty: -12 },
+  { id: 6, w: 30, top: "42%", left: "1%",  z: 20, dur: 9.5, delay: -4,   rot: -8,  tx: 14, ty: -20 },
+  { id: 7, w: 24, top: "35%", right: "4%", z: 5,  dur: 8.2, delay: -2,   rot: 7,   tx: -14, ty: -16 },
+  { id: 8, w: 38, top: "65%", right: "3%", z: 20, dur: 10.5,delay: -6,   rot: -9,  tx: -18, ty: -12 },
 ];
 
 function LeafSvg({ w }: { w: number }) {
@@ -39,7 +39,8 @@ function LeafSvg({ w }: { w: number }) {
   );
 }
 
-const SPRING = { type: "spring" as const, stiffness: 120, damping: 14, mass: 1 };
+const SPRING        = { type: "spring" as const, stiffness: 220, damping: 32, mass: 0.75 };
+const SPRING_MOBILE = { duration: 0.48, ease: [0.22, 1, 0.36, 1] } as const;
 
 export function Hero() {
   const [active, setActive] = useState(0);
@@ -109,22 +110,22 @@ export function Hero() {
                 className="absolute"
                 style={{ width: 240, height: 240 }}
                 variants={{
-                  enter: (dir: number) => ({ rotate: dir * 180, scale: 0.6, opacity: 0 }),
-                  center: { rotate: 0, scale: 1, opacity: 1 },
-                  exit:  (dir: number) => ({ rotate: dir * -180, scale: 0.5, opacity: 0 }),
+                  enter: (dir: number) => ({ x: dir * 36, y: 10, rotate: dir * 4, scale: 0.9, opacity: 0 }),
+                  center: { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 },
+                  exit:  (dir: number) => ({ x: dir * -36, y: -10, rotate: dir * -4, scale: 0.9, opacity: 0 }),
                 }}
                 initial="enter"
                 animate="center"
                 exit="exit"
-                transition={SPRING}
+                transition={SPRING_MOBILE}
               >
                 <motion.img
                   src={BOWLS[active].image}
                   alt={BOWLS[active].name}
                   className="w-full h-full object-contain"
                   style={{ filter: "drop-shadow(0 24px 48px rgba(0,0,0,0.7))" }}
-                  animate={{ y: [-8, 8, -8] }}
-                  transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+                  animate={{ y: [-4, 4, -4] }}
+                  transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
                   className="absolute top-0 right-0 px-3 py-1.5 rounded-full font-bold text-sm text-white"
@@ -330,9 +331,9 @@ export function Hero() {
                 className="absolute"
                 style={{ width: 320, height: 320, left: SLOTS[0].x / 700 * 100 + "%", top: SLOTS[0].y / 600 * 100 + "%", transform: "translate(-50%, -50%)", zIndex: 10 }}
                 variants={{
-                  enter: (dir: number) => ({ rotate: dir * 360, scale: 0.5, opacity: 0, x: dir * 80, y: dir * 60 }),
-                  center: { rotate: 0, scale: 1, opacity: 1, x: 0, y: 0 },
-                  exit:  (dir: number) => ({ rotate: dir * -360, scale: 0, opacity: 0, x: dir * -80, y: dir * -60 }),
+                  enter: (dir: number) => ({ x: dir * 70, y: 16, rotate: dir * 5, scale: 0.88, opacity: 0 }),
+                  center: { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 },
+                  exit:  (dir: number) => ({ x: dir * -70, y: -16, rotate: dir * -5, scale: 0.88, opacity: 0 }),
                 }}
                 initial="enter"
                 animate="center"
@@ -344,8 +345,8 @@ export function Hero() {
                   alt={BOWLS[active].name}
                   className="w-full h-full object-contain"
                   style={{ filter: "drop-shadow(0 32px 64px rgba(0,0,0,0.7))" }}
-                  animate={{ y: [-12, 12, -12] }}
-                  transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+                  animate={{ y: [-7, 7, -7], x: [-2, 2, -2] }}
+                  transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
                 />
                 <motion.div
                   className="absolute -top-2 -right-2 px-3 py-1.5 rounded-full font-bold text-sm text-white"
