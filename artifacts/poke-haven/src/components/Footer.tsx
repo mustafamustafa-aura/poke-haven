@@ -28,17 +28,17 @@ function TikTokIcon() {
 const SOCIALS = [
   {
     label: "Facebook",
-    href: "https://www.facebook.com/pokehavenkortrijk",
+    href: "https://www.facebook.com/share/1CoVdPmCc1/",
     icon: <FacebookIcon />,
   },
   {
     label: "Instagram",
-    href: "https://www.instagram.com/pokehavenkortrijk",
+    href: "https://www.instagram.com/pokehavenkortrijk?igsh=ZGZkdm9laXh6bDBz",
     icon: <InstagramIcon />,
   },
   {
     label: "TikTok",
-    href: "https://www.tiktok.com/@pokehavenkortrijk",
+    href: "https://www.tiktok.com/@poke.haven1?_r=1&_t=ZS-96PQ05Yp38m",
     icon: <TikTokIcon />,
   },
 ];
@@ -61,6 +61,16 @@ export function Footer() {
       <div style={{ height: 1, background: "rgba(242,101,34,0.25)" }} />
 
       <div className="container mx-auto px-5 pt-14 pb-8">
+        {/* Restaurant interior photo */}
+        <div className="mb-10 rounded-2xl overflow-hidden" style={{ maxHeight: 280 }}>
+          <img
+            src="/footer-interior.jpg"
+            alt="Poke Haven interieur"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: "center 40%" }}
+          />
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
 
           {/* Brand */}
@@ -81,8 +91,11 @@ export function Footer() {
                 <span style={{ color: "#fff" }}>VEN</span>
               </span>
             </div>
+            <p className="text-sm font-semibold mb-1" style={{ color: "#fff" }}>
+              An island escape, right in the cityscape.
+            </p>
             <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.85)" }}>
-              Verse poke bowls op maat gemaakt met de lekkerste ingrediënten, bereid met passie.
+              At Poke Haven, we serve handcrafted poke bowls made with responsibly sourced ingredients, house-made sauces, and flavors that transport you straight to the islands.
             </p>
             {/* Social icons */}
             <div className="flex gap-2">
