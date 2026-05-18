@@ -100,45 +100,7 @@ export function Hero() {
         style={{ zIndex: 10 }}
       >
         {/* ── MOBILE layout (hidden on lg+) ── */}
-        <div className="flex flex-col items-start text-left lg:hidden pt-4 pb-8">
-          {/* Mobile bowl image — centered, large */}
-          <div className="relative w-full flex justify-center mb-2" style={{ minHeight: 240 }}>
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={BOWLS[active].id + "-mobile"}
-                custom={direction}
-                className="absolute"
-                style={{ width: 240, height: 240 }}
-                variants={{
-                  enter: (dir: number) => ({ x: dir * 36, y: 10, rotate: dir * 4, scale: 0.9, opacity: 0 }),
-                  center: { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 },
-                  exit:  (dir: number) => ({ x: dir * -36, y: -10, rotate: dir * -4, scale: 0.9, opacity: 0 }),
-                }}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={SPRING_MOBILE}
-              >
-                <motion.img
-                  src={BOWLS[active].image}
-                  alt={BOWLS[active].name}
-                  className="w-full h-full object-contain"
-                  style={{ filter: "drop-shadow(0 24px 48px rgba(0,0,0,0.7))" }}
-                  animate={{ y: [-4, 4, -4] }}
-                  transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
-                />
-                <motion.div
-                  className="absolute top-0 right-0 px-3 py-1.5 rounded-full font-bold text-sm text-white"
-                  style={{ background: "#F26522", boxShadow: "0 4px 14px rgba(242,101,34,0.5)" }}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 400, damping: 20 }}
-                >
-                  {BOWLS[active].price}
-                </motion.div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+        <div className="flex flex-col items-start text-left lg:hidden pt-2 pb-8">
 
           {/* Headline */}
           {["Vers.", "Gedurfd.", "Poke."].map((word, i) => (
@@ -156,7 +118,7 @@ export function Hero() {
           ))}
 
           <motion.p
-            className="text-sm mt-4 leading-relaxed max-w-xs"
+            className="text-sm mt-3 leading-relaxed max-w-xs"
             style={{ color: "#A0AEC0" }}
             initial={{ opacity: 0, y: 16 }}
             animate={entered ? { opacity: 1, y: 0 } : {}}
@@ -164,6 +126,117 @@ export function Hero() {
           >
             Ocean vibes, tropische energie en de meest verse ingrediënten — vers voor u bereid.
           </motion.p>
+
+          {/* ── Mobile orbital showcase ── */}
+          <motion.div
+            className="relative w-full mt-5"
+            style={{ height: 320 }}
+            initial={{ opacity: 0 }}
+            animate={entered ? { opacity: 1 } : {}}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            {/* Dashed arc behind thumbnails */}
+            <svg
+              viewBox="0 0 360 120"
+              className="absolute bottom-0 left-0 right-0 w-full"
+              style={{ height: 120, overflow: "visible", zIndex: 1 }}
+              aria-hidden="true"
+            >
+              <path
+                d="M 40 100 A 140 140 0 0 1 320 100"
+                fill="none"
+                stroke="#F26522"
+                strokeOpacity="0.3"
+                strokeWidth="1.5"
+                strokeDasharray="6 8"
+                strokeLinecap="round"
+              />
+              {[80, 180, 280].map((cx, i) => (
+                <circle key={i} cx={cx} cy={98} r="3" fill="#F26522" fillOpacity="0.35" />
+              ))}
+            </svg>
+
+            {/* Main bowl — same size & spring as desktop */}
+            <div
+              className="absolute left-1/2"
+              style={{ top: 0, transform: "translateX(-50%)", zIndex: 10 }}
+            >
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={BOWLS[active].id + "-mobile"}
+                  custom={direction}
+                  style={{ width: 260, height: 260, position: "relative", willChange: "transform" }}
+                  variants={{
+                    enter: (dir: number) => ({ x: dir * 70, y: 16, rotate: dir * 5, scale: 0.88, opacity: 0 }),
+                    center: { x: 0, y: 0, rotate: 0, scale: 1, opacity: 1 },
+                    exit:  (dir: number) => ({ x: dir * -70, y: -16, rotate: dir * -5, scale: 0.88, opacity: 0 }),
+                  }}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={SPRING}
+                >
+                  <motion.img
+                    src={BOWLS[active].image}
+                    alt={BOWLS[active].name}
+                    style={{
+                      width: "100%", height: "100%", objectFit: "contain",
+                      filter: "drop-shadow(0 20px 36px rgba(0,0,0,0.65))",
+                      willChange: "transform",
+                    }}
+                    animate={{ y: [-7, 7, -7], x: [-2, 2, -2] }}
+                    transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.div
+                    className="absolute px-3 py-1.5 rounded-full font-bold text-sm text-white"
+                    style={{
+                      top: 4, right: 4,
+                      background: "#F26522",
+                      boxShadow: "0 4px 14px rgba(242,101,34,0.5)",
+                    }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.22, type: "spring", stiffness: 400, damping: 20 }}
+                  >
+                    {BOWLS[active].price}
+                  </motion.div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Thumbnail bowls — same as desktop orbital, in a row */}
+            <div
+              className="absolute bottom-0 left-0 right-0 flex justify-center gap-6"
+              style={{ zIndex: 8 }}
+            >
+              {thumbBowls.slice(0, 3).map((bowl, tIdx) => {
+                const isHighlight = tIdx === 0;
+                return (
+                  <motion.button
+                    key={bowl.id + "-thumb-mob"}
+                    className="rounded-full overflow-hidden"
+                    style={{
+                      width: 70, height: 70, flexShrink: 0,
+                      border: isHighlight ? "2px solid #F26522" : "2px solid #1A2432",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+                      background: "#1A2432",
+                      touchAction: "manipulation",
+                      WebkitTapHighlightColor: "transparent",
+                      willChange: "transform",
+                    }}
+                    onClick={() => navigate(BOWLS.indexOf(bowl))}
+                    initial={{ opacity: 0, scale: 0.6 }}
+                    animate={{ opacity: 1, scale: isHighlight ? 1.14 : 1 }}
+                    transition={{ ...SPRING, delay: 0.07 * tIdx }}
+                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.16, borderColor: "#F26522" }}
+                  >
+                    <img src={bowl.image} alt={bowl.name} className="w-full h-full object-contain" />
+                  </motion.button>
+                );
+              })}
+            </div>
+          </motion.div>
 
           {/* Bowl name / tagline */}
           <AnimatePresence mode="wait">
@@ -173,15 +246,16 @@ export function Hero() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.28 }}
             >
-              <p className="font-display font-bold text-lg text-white">{BOWLS[active].name}</p>
+              <p className="font-display font-bold text-xl text-white">{BOWLS[active].name}</p>
               <p className="text-xs mt-0.5" style={{ color: "#A0AEC0" }}>{BOWLS[active].tagline}</p>
+              <p className="font-bold text-base mt-1" style={{ color: "#F26522" }}>{BOWLS[active].price}</p>
             </motion.div>
           </AnimatePresence>
 
           {/* Dot pagination (mobile) */}
-          <div className="flex gap-2 mt-5">
+          <div className="flex gap-2 mt-4">
             {BOWLS.map((_, i) => (
               <motion.button
                 key={i}
@@ -196,7 +270,7 @@ export function Hero() {
 
           {/* CTA buttons */}
           <motion.div
-            className="flex gap-3 flex-wrap mt-6"
+            className="flex gap-3 flex-wrap mt-5"
             initial={{ opacity: 0, y: 16 }}
             animate={entered ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.55 }}
