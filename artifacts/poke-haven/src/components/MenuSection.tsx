@@ -2,15 +2,17 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 /* ─── Signature bowls ─────────────────────────────────────────────────────── */
-const SIGNATURE = [
-  { id: "zalm",          name: "Poke Zalm",             price: "€13.90", image: "/bowl-zalim-new.png",       tag: "Populair",   desc: "Sushirijst, zalm, srirachamayo, wakame, wasabimayo, rode ui, komkommer, edamame, wasabi, gefrituurde ui, bosui", rating: 4.9 },
-  { id: "tuna",          name: "Poke Tuna",             price: "€13.90", image: "/bowl-tuna-new.png",        tag: null,         desc: "Sushirijst, srirachamayo, wasabimayo, wakame, rode ui, komkommer, edamame, tonijn, jalapeños, wasabi crunch, bosui", rating: 4.7 },
-  { id: "falafel",       name: "Poke Falafel",          price: "€13.90", image: "/bowl-falafel-new.png",     tag: "Vegan",      desc: "Bruine rijst, salademix, srirachamayo, falafel, maïs, paprika, edamame, avocado, gefrituurde ui, bosui", rating: 4.7 },
-  { id: "paling",        name: "Poke Paling Teriyaki",  price: "€15.90", image: "/bowl-haven.png",           tag: "Premium",    desc: "Sushirijst, paling, teriyakisaus, komkommer, mango, avocado, Japanse crunch, wakame, masago, sesammix", rating: 4.9 },
-  { id: "haven",         name: "Haven Speciaal",        price: "€14.90", image: "/bowl-haven.png",           tag: "Chef's keuze", desc: "Sushirijst, zalm & tonijn, srirachamayo, avocado, wakame, surimi, Japanse crunch, masago, sesammix", rating: 4.9 },
-  { id: "garnalen",      name: "Poke Garnalen",         price: "€13.90", image: "/bowl-garnalen-png.png",   tag: null,         desc: "Sushirijst, Hawaiiaanse mayo, wakame, edamame, rode ui, rode biet, garnaal, sesammix, masago, wasabi", rating: 4.8 },
-  { id: "vlees",         name: "Vlees Speciaal",        price: "€13.90", image: "/bowl-vlees.png",          tag: null,         desc: "Bruine rijst, Hawaiiaanse mayo, Haven aioli, wortel, cherrytomaatjes, paprika, rode ui, gemarineerd rundvlees, amandelen, cashewnoten, sesammix", rating: 4.8 },
-  { id: "shoyu-tofu",    name: "Shoyu Tofu",            price: "€13.90", image: "/bowl-tofu.png",           tag: "Vegan",      desc: "Bruine rijst, Hawaiiaanse mayo, srirachamayo, avocado, komkommer, maïs, cherrytomaatjes, gemarineerde tofu, amandelen, cashewnoten, sesammix", rating: 4.7 },
+const SIGNATURE: { id: string; name: string; price: string; image: string | null; tag: string | null; desc: string; rating: number }[] = [
+  { id: "crispy-kip",    name: "Warm Crispy Kip",       price: "€13.90", image: "/bowl-kip-new.png",         tag: "Bestseller", desc: "Sushirijst, crispy kip, srirachamayo, rode ui, mango, komkommer, avocado, gefrituurde ui, kameya, Japanse crisp, lente-ui", rating: 4.8 },
+  { id: "del-kip",       name: "Delicious Kip",         price: "€13.90", image: null,                        tag: null,         desc: "Sushirijst, crispy kip, srirachamayo, rode ui, mango, komkommer, maïs, paprika, gefrituurde ui, kameya, Japanse crisp, lente-ui", rating: 4.6 },
+  { id: "zalm",          name: "Poke Zalm",             price: "€13.90", image: "/bowl-zalim-new.png",        tag: "Populair",   desc: "Sushirijst, zalm, srirachamayo, wakame, wasabimayo, rode ui, komkommer, edamame, wasabi, gefrituurde ui, bosui", rating: 4.9 },
+  { id: "tuna",          name: "Poke Tuna",             price: "€13.90", image: "/bowl-tuna-new.png",         tag: null,         desc: "Sushirijst, srirachamayo, wasabimayo, wakame, rode ui, komkommer, edamame, tonijn, jalapeños, wasabi crunch, bosui", rating: 4.7 },
+  { id: "falafel",       name: "Poke Falafel",          price: "€13.90", image: "/bowl-falafel-new.png",      tag: "Vegan",      desc: "Bruine rijst, salademix, srirachamayo, falafel, maïs, paprika, edamame, avocado, gefrituurde ui, bosui", rating: 4.7 },
+  { id: "paling",        name: "Poke Paling Teriyaki",  price: "€15.90", image: null,                        tag: "Premium",    desc: "Sushirijst, paling, teriyakisaus, komkommer, mango, avocado, Japanse crunch, wakame, masago, sesammix", rating: 4.9 },
+  { id: "haven",         name: "Haven Speciaal",        price: "€14.90", image: "/bowl-haven.png",            tag: "Chef's keuze", desc: "Sushirijst, zalm & tonijn, srirachamayo, avocado, wakame, surimi, Japanse crunch, masago, sesammix", rating: 4.9 },
+  { id: "garnalen",      name: "Poke Garnalen",         price: "€13.90", image: "/bowl-garnalen-png.png",     tag: null,         desc: "Sushirijst, Hawaiiaanse mayo, wakame, edamame, rode ui, rode biet, garnaal, sesammix, masago, wasabi", rating: 4.8 },
+  { id: "vlees",         name: "Vlees Speciaal",        price: "€13.90", image: "/bowl-vlees.png",            tag: null,         desc: "Bruine rijst, Hawaiiaanse mayo, Haven aioli, wortel, cherrytomaatjes, paprika, rode ui, gemarineerd rundvlees, amandelen, cashewnoten, sesammix", rating: 4.8 },
+  { id: "shoyu-tofu",    name: "Shoyu Tofu",            price: "€13.90", image: "/bowl-tofu.png",             tag: "Vegan",      desc: "Bruine rijst, Hawaiiaanse mayo, srirachamayo, avocado, komkommer, maïs, cherrytomaatjes, gemarineerde tofu, amandelen, cashewnoten, sesammix", rating: 4.7 },
 ];
 
 /* ─── Drinks & desserts as structured text lists ──────────────────────────── */
@@ -87,14 +89,27 @@ function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
         </div>
       )}
       <div className="flex justify-center pt-6 pb-2 overflow-hidden">
-        <motion.img
-          src={item.image}
-          alt={item.name}
-          className="object-contain rounded-full"
-          style={{ width: 110, height: 110, background: "transparent" }}
-          whileHover={{ scale: 1.1, rotate: 7 }}
-          transition={{ duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
-        />
+        {item.image ? (
+          <motion.img
+            src={item.image}
+            alt={item.name}
+            className="object-contain"
+            style={{ width: 110, height: 110, background: "transparent" }}
+            whileHover={{ scale: 1.1, rotate: 7 }}
+            transition={{ duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
+          />
+        ) : (
+          <div
+            className="flex items-center justify-center rounded-full"
+            style={{ width: 110, height: 110, background: "rgba(242,101,34,0.08)", border: "1.5px dashed rgba(242,101,34,0.25)" }}
+          >
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3C7 3 3 7 3 12s4 9 9 9 9-4 9-9-4-9-9-9z" stroke="#F26522" strokeWidth="1.2" strokeLinecap="round" fill="rgba(242,101,34,0.08)" />
+              <path d="M7 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#F26522" strokeWidth="1.2" strokeLinecap="round" />
+              <path d="M5 14h14" stroke="#F26522" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+          </div>
+        )}
       </div>
       <div className="p-4 flex flex-col flex-1">
         <h3 className="font-display font-bold text-white text-sm mb-1">{item.name}</h3>
