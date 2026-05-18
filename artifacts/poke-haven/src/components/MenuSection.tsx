@@ -137,46 +137,71 @@ function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
 }
 
 /* ─── Drinks & Desserts panel ─────────────────────────────────────────────── */
-function DrinkRow({ name, desc, price }: { name: string; desc?: string; price: string }) {
+function DrinkRow({
+  name, desc, price, onAdd,
+}: { name: string; desc?: string; price: string; onAdd: () => void }) {
   return (
     <div
-      className="flex items-start justify-between gap-4 py-3"
+      className="flex items-center justify-between gap-3 py-3"
       style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-white text-sm">{name}</p>
         {desc && <p className="text-xs mt-0.5" style={{ color: "#A0AEC0" }}>{desc}</p>}
       </div>
-      <span className="font-bold text-sm whitespace-nowrap" style={{ color: "#F26522" }}>{price}</span>
+      <div className="flex items-center gap-3 shrink-0">
+        <span className="font-bold text-sm whitespace-nowrap" style={{ color: "#F26522" }}>{price}</span>
+        <motion.button
+          onClick={onAdd}
+          className="px-3 py-1.5 rounded-full font-bold text-xs text-white"
+          style={{ background: "#59B259", touchAction: "manipulation", WebkitTapHighlightColor: "transparent", minWidth: 72 }}
+          whileHover={{ background: "#48BB78", scale: 1.04 }}
+          whileTap={{ scale: 0.94 }}
+        >
+          + Bestellen
+        </motion.button>
+      </div>
     </div>
   );
 }
 
-function DrinkSubSection({ title, items }: { title: string; items: { name: string; desc?: string; price: string }[] }) {
+function DrinkSubSection({
+  title, items, onAdd,
+}: { title: string; items: { name: string; desc?: string; price: string }[]; onAdd: (name: string, price: string) => void }) {
   return (
     <div className="mb-6">
       <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#59B259" }}>{title}</p>
-      {items.map(item => <DrinkRow key={item.name} {...item} />)}
+      {items.map(item => (
+        <DrinkRow
+          key={item.name}
+          {...item}
+          onAdd={() => onAdd(item.name, item.price)}
+        />
+      ))}
     </div>
   );
 }
 
 function DrankenPanel() {
+  const { addItem } = useCart();
+  const handleAdd = (name: string, price: string) =>
+    addItem({ id: `drink-${name.toLowerCase().replace(/\s+/g, "-")}`, name, price, image: null });
+
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <div
         className="rounded-2xl p-6"
         style={{ background: "#1A2432", border: "1px solid rgba(255,255,255,0.06)" }}
       >
-        <DrinkSubSection title="Smoothies" items={DRANKEN.smoothies} />
-        <DrinkSubSection title="Koude Dranken" items={DRANKEN.koud} />
+        <DrinkSubSection title="Smoothies"     items={DRANKEN.smoothies} onAdd={handleAdd} />
+        <DrinkSubSection title="Koude Dranken" items={DRANKEN.koud}      onAdd={handleAdd} />
       </div>
       <div
         className="rounded-2xl p-6"
         style={{ background: "#1A2432", border: "1px solid rgba(255,255,255,0.06)" }}
       >
-        <DrinkSubSection title="Warme Dranken" items={DRANKEN.warm} />
-        <DrinkSubSection title="IJs & Desserts" items={DRANKEN.desserts} />
+        <DrinkSubSection title="Warme Dranken" items={DRANKEN.warm}     onAdd={handleAdd} />
+        <DrinkSubSection title="IJs & Desserts" items={DRANKEN.desserts} onAdd={handleAdd} />
       </div>
     </div>
   );
