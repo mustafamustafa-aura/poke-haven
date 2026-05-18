@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/lib/cart";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { totalCount, openCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -79,6 +81,38 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* Cart button */}
+          <button
+            onClick={openCart}
+            className="relative flex items-center justify-center w-10 h-10 rounded-full transition-colors"
+            style={{ background: "rgba(255,255,255,0.07)", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.13)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; }}
+            data-testid="button-cart"
+            aria-label="Winkelwagen"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <circle cx="9" cy="21" r="1.5" fill="#fff" />
+              <circle cx="19" cy="21" r="1.5" fill="#fff" />
+              <path d="M1 1h3l2.68 13.39a2 2 0 001.98 1.61H19a2 2 0 001.96-1.61L23 6H6" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            <AnimatePresence>
+              {totalCount > 0 && (
+                <motion.span
+                  key="badge"
+                  className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full text-white font-black"
+                  style={{ background: "#F26522", fontSize: 10 }}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  transition={{ type: "spring", damping: 16, stiffness: 300 }}
+                >
+                  {totalCount > 9 ? "9+" : totalCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </button>
+
           {/* CTA */}
           <button
             onClick={() => scrollTo("builder")}

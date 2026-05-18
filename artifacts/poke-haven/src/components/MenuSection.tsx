@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/lib/cart";
 
 /* ─── Signature bowls ─────────────────────────────────────────────────────── */
 const SIGNATURE: { id: string; name: string; price: string; image: string | null; tag: string | null; desc: string; rating: number }[] = [
@@ -72,6 +73,8 @@ function Stars({ n }: { n: number }) {
 }
 
 function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
+  const { addItem } = useCart();
+
   return (
     <motion.div
       data-testid={`card-${item.id}`}
@@ -123,6 +126,7 @@ function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
             whileHover={{ background: "#48BB78", scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
             data-testid={`button-add-${item.id}`}
+            onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.image })}
           >
             + Bestellen
           </motion.button>
@@ -247,7 +251,7 @@ export function MenuSection() {
               exit={{ opacity: 0 }}
               variants={{ show: { transition: { staggerChildren: 0.08 } }, hidden: {} }}
             >
-              {SIGNATURE.map((item) => <BowlCard key={item.id} item={item} />)}
+              {[...SIGNATURE].sort((a, b) => (a.image ? 0 : 1) - (b.image ? 0 : 1)).map((item) => <BowlCard key={item.id} item={item} />)}
             </motion.div>
           ) : (
             <motion.div
