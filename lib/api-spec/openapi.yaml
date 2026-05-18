@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: orders
+    description: Order operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,64 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /orders:
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Place a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List all orders (admin)
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+
+  /orders/{id}:
+    patch:
+      operationId: updateOrderStatus
+      tags: [orders]
+      summary: Update order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateOrderStatusRequest"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +94,71 @@ components:
       required:
         - status
 
+    OrderItem:
+      type: object
+      required: [id, name, price, quantity]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        price:
+          type: string
+        quantity:
+          type: integer
+        image:
+          type: string
+          nullable: true
+
+    CreateOrderRequest:
+      type: object
+      required: [items, total]
+      properties:
+        customerName:
+          type: string
+        customerPhone:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        total:
+          type: string
+        notes:
+          type: string
+
+    UpdateOrderStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [pending, preparing, ready, completed, cancelled]
+
+    Order:
+      type: object
+      required: [id, items, total, status, createdAt]
+      properties:
+        id:
+          type: integer
+        customerName:
+          type: string
+          nullable: true
+        customerPhone:
+          type: string
+          nullable: true
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        total:
+          type: string
+        notes:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, preparing, ready, completed, cancelled]
+        createdAt:
+          type: string
+          format: date-time

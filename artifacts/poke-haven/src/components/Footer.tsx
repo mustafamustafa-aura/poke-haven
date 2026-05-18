@@ -98,6 +98,33 @@ export function Footer() {
               <p className="pt-2">
                 <a href="tel:+32471843511" style={{ color: "rgba(255,255,255,0.85)", touchAction: "manipulation" }}>+32 471 84 35 11</a>
               </p>
+              {/* Google Maps link */}
+              <a
+                href="https://www.google.com/maps/place/POKE+HAVEN+(+Pok%C3%A9+bowls+)/@50.8272216,3.2697093,17z"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mt-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all"
+                style={{ background: "rgba(255,255,255,0.15)", color: "#fff", textDecoration: "none" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.25)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.15)"; }}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                Bekijk op Google Maps
+              </a>
+            </div>
+            {/* Mini map embed */}
+            <div className="mt-3 rounded-xl overflow-hidden" style={{ height: 110, border: "1px solid rgba(255,255,255,0.15)" }}>
+              <iframe
+                src="https://maps.google.com/maps?q=50.8272216,3.2697093&z=17&output=embed"
+                width="100%"
+                height="110"
+                style={{ border: 0, display: "block" }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Poke Haven locatie"
+              />
             </div>
           </div>
 

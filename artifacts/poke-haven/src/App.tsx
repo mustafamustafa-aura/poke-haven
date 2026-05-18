@@ -1,3 +1,4 @@
+import { Router, Route, Switch } from "wouter";
 import { CartProvider } from "@/lib/cart";
 import { CartDrawer } from "@/components/CartDrawer";
 import { Navbar } from "@/components/Navbar";
@@ -6,8 +7,9 @@ import { MenuSection } from "@/components/MenuSection";
 import { BowlBuilder } from "@/components/BowlBuilder";
 import { AboutSection } from "@/components/AboutSection";
 import { Footer } from "@/components/Footer";
+import { AdminPage } from "@/pages/AdminPage";
 
-function App() {
+function MainSite() {
   return (
     <CartProvider>
       <div className="min-h-screen bg-background text-foreground selection:bg-primary selection:text-primary-foreground font-sans overflow-x-hidden">
@@ -22,6 +24,17 @@ function App() {
         <Footer />
       </div>
     </CartProvider>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Switch>
+        <Route path="/admin" component={AdminPage} />
+        <Route component={MainSite} />
+      </Switch>
+    </Router>
   );
 }
 
