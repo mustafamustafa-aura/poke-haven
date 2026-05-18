@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 
-/* ─── Social icon SVGs ───────────────────────────────────────────────────── */
 function FacebookIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -26,28 +25,16 @@ function TikTokIcon() {
 }
 
 const SOCIALS = [
-  {
-    label: "Facebook",
-    href: "https://www.facebook.com/share/1CoVdPmCc1/",
-    icon: <FacebookIcon />,
-  },
-  {
-    label: "Instagram",
-    href: "https://www.instagram.com/pokehavenkortrijk?igsh=ZGZkdm9laXh6bDBz",
-    icon: <InstagramIcon />,
-  },
-  {
-    label: "TikTok",
-    href: "https://www.tiktok.com/@poke.haven1?_r=1&_t=ZS-96PQ05Yp38m",
-    icon: <TikTokIcon />,
-  },
+  { label: "Facebook",  href: "https://www.facebook.com/share/1CoVdPmCc1/",                                    icon: <FacebookIcon /> },
+  { label: "Instagram", href: "https://www.instagram.com/pokehavenkortrijk?igsh=ZGZkdm9laXh6bDBz",            icon: <InstagramIcon /> },
+  { label: "TikTok",    href: "https://www.tiktok.com/@poke.haven1?_r=1&_t=ZS-96PQ05Yp38m",                  icon: <TikTokIcon /> },
 ];
 
 const QUICK_LINKS = [
-  { label: "Home",                    id: "" },
-  { label: "Over Ons",                id: "about" },
-  { label: "Menu",                    id: "menu" },
-  { label: "Stel Je Eigen Bowl Samen",id: "builder" },
+  { label: "Home",                     id: "" },
+  { label: "Over Ons",                 id: "about" },
+  { label: "Menu",                     id: "menu" },
+  { label: "Stel Je Eigen Bowl Samen", id: "builder" },
 ];
 
 export function Footer() {
@@ -60,22 +47,12 @@ export function Footer() {
     <footer style={{ background: "#59B259" }}>
       <div style={{ height: 1, background: "rgba(242,101,34,0.25)" }} />
 
-      <div className="container mx-auto px-5 pt-14 pb-8">
-        {/* Restaurant interior photo */}
-        <div className="mb-10 rounded-2xl overflow-hidden" style={{ maxHeight: 280 }}>
-          <img
-            src="/footer-interior.jpg"
-            alt="Poke Haven interieur"
-            className="w-full h-full object-cover"
-            style={{ objectPosition: "center 40%" }}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+      <div className="container mx-auto px-5 pt-12 pb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
 
           {/* Brand */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-2 mb-5">
               <img
                 src="/logo.png"
                 alt="Poke Haven"
@@ -91,13 +68,6 @@ export function Footer() {
                 <span style={{ color: "#fff" }}>VEN</span>
               </span>
             </div>
-            <p className="text-sm font-semibold mb-1" style={{ color: "#fff" }}>
-              An island escape, right in the cityscape.
-            </p>
-            <p className="text-sm leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.85)" }}>
-              At Poke Haven, we serve handcrafted poke bowls made with responsibly sourced ingredients, house-made sauces, and flavors that transport you straight to the islands.
-            </p>
-            {/* Social icons */}
             <div className="flex gap-2">
               {SOCIALS.map((s) => (
                 <a
@@ -106,8 +76,8 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-white transition-all duration-200 hover:scale-110"
-                  style={{ background: "rgba(255,255,255,0.2)", touchAction: "manipulation" }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-200 active:scale-90"
+                  style={{ background: "rgba(255,255,255,0.2)", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "#F26522"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.2)"; }}
                   data-testid={`social-${s.label.toLowerCase()}`}
@@ -120,39 +90,39 @@ export function Footer() {
 
           {/* Address */}
           <div>
-            <h5 className="font-display font-bold text-white text-base mb-4">Bezoek Ons</h5>
+            <h5 className="font-display font-bold text-white text-sm mb-3">Bezoek Ons</h5>
             <div className="space-y-1 text-sm" style={{ color: "rgba(255,255,255,0.85)" }}>
               <p className="font-semibold text-white">Poke Haven</p>
               <p>Steenpoort 13</p>
               <p>8500 Kortrijk</p>
               <p className="pt-2">
-                <a href="tel:+32471843511" style={{ color: "rgba(255,255,255,0.85)" }}>+32 471 84 35 11</a>
+                <a href="tel:+32471843511" style={{ color: "rgba(255,255,255,0.85)", touchAction: "manipulation" }}>+32 471 84 35 11</a>
               </p>
             </div>
           </div>
 
           {/* Hours */}
           <div>
-            <h5 className="font-display font-bold text-white text-base mb-4">Openingsuren</h5>
+            <h5 className="font-display font-bold text-white text-sm mb-3">Openingsuren</h5>
             <div className="space-y-2 text-sm" style={{ color: "rgba(255,255,255,0.85)" }}>
-              <div className="flex justify-between gap-4">
-                <span>Maandag – Zondag</span>
-                <span className="font-semibold text-white">11:00 – 22:00</span>
+              <div>
+                <p>Maandag – Zondag</p>
+                <p className="font-semibold text-white">11:00 – 22:00</p>
               </div>
-              <p className="text-xs pt-1" style={{ color: "rgba(255,255,255,0.65)" }}>7 dagen per week geopend</p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.65)" }}>7 dagen per week geopend</p>
             </div>
           </div>
 
           {/* Quick links */}
           <div>
-            <h5 className="font-display font-bold text-white text-base mb-4">Snelle Links</h5>
+            <h5 className="font-display font-bold text-white text-sm mb-3">Snelle Links</h5>
             <ul className="space-y-2 text-sm">
               {QUICK_LINKS.map((link) => (
                 <li key={link.label}>
                   <button
                     onClick={() => scrollTo(link.id)}
-                    className="text-left transition-colors duration-200"
-                    style={{ color: "rgba(255,255,255,0.85)", touchAction: "manipulation" }}
+                    className="text-left transition-colors duration-200 py-0.5"
+                    style={{ color: "rgba(255,255,255,0.85)", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
                     onMouseEnter={(e) => {
                       (e.currentTarget as HTMLButtonElement).style.color = "#fff";
                       (e.currentTarget as HTMLButtonElement).style.textDecoration = "underline";
@@ -174,7 +144,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div
-          className="pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs"
+          className="pt-5 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs"
           style={{ borderTop: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.65)" }}
         >
           <p>&copy; {new Date().getFullYear()} Poke Haven · Steenpoort 13, 8500 Kortrijk</p>
