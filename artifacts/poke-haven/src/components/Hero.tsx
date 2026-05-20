@@ -156,10 +156,18 @@ export function Hero() {
               ))}
             </svg>
 
-            {/* Main bowl — same size & spring as desktop */}
-            <div
+            {/* Main bowl — draggable for swipe, same size & spring as desktop */}
+            <motion.div
               className="absolute left-1/2"
-              style={{ top: 0, transform: "translateX(-50%)", zIndex: 10 }}
+              style={{ top: 0, transform: "translateX(-50%)", zIndex: 10, cursor: "grab", touchAction: "pan-y" }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.18}
+              dragMomentum={false}
+              onDragEnd={(_, info) => {
+                if (info.offset.x < -45) navigate((active + 1) % BOWLS.length);
+                else if (info.offset.x > 45) navigate((active - 1 + BOWLS.length) % BOWLS.length);
+              }}
             >
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
@@ -202,40 +210,42 @@ export function Hero() {
                   </motion.div>
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </motion.div>
 
-            {/* Thumbnail bowls — same as desktop orbital, in a row */}
-            <div
-              className="absolute bottom-0 left-0 right-0 flex justify-center gap-6"
-              style={{ zIndex: 8 }}
-            >
-              {thumbBowls.slice(0, 3).map((bowl, tIdx) => {
-                const isHighlight = tIdx === 0;
-                return (
-                  <motion.button
-                    key={bowl.id + "-thumb-mob"}
-                    className="rounded-full overflow-hidden"
-                    style={{
-                      width: 70, height: 70, flexShrink: 0,
-                      border: isHighlight ? "2px solid #F26522" : "2px solid #1A2432",
-                      boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
-                      background: "#1A2432",
-                      touchAction: "manipulation",
-                      WebkitTapHighlightColor: "transparent",
-                      willChange: "transform",
-                    }}
-                    onClick={() => navigate(BOWLS.indexOf(bowl))}
-                    initial={{ opacity: 0, scale: 0.6 }}
-                    animate={{ opacity: 1, scale: isHighlight ? 1.14 : 1 }}
-                    transition={{ ...SPRING, delay: 0.07 * tIdx }}
-                    whileTap={{ scale: 0.9 }}
-                    whileHover={{ scale: 1.16, borderColor: "#F26522" }}
-                  >
-                    <img src={bowl.image} alt={bowl.name} className="w-full h-full object-contain" />
-                  </motion.button>
-                );
-              })}
-            </div>
+            {/* Thumbnail bowls — arc-positioned: sit on the dashed arc at the bottom */}
+            {thumbBowls.slice(0, 3).map((bowl, tIdx) => {
+              // Arc SVG is bottom-0, height 120. Endpoints at viewBox y=100/120 → ~245px from container top.
+              // Center dips slightly lower. Left/right spread evenly across the arc.
+              const arcTop = [242, 252, 242][tIdx] ?? 242;
+              const arcLeft = [72, 50, 28][tIdx]; // % from left — spread to match arc endpoints
+              return (
+                <motion.button
+                  key={bowl.id + "-thumb-mob"}
+                  className="absolute rounded-full overflow-hidden"
+                  style={{
+                    width: 68, height: 68,
+                    left: `${arcLeft}%`,
+                    top: arcTop,
+                    transform: "translateX(-50%)",
+                    border: "2px solid rgba(255,255,255,0.1)",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+                    background: "#1A2432",
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
+                    willChange: "transform",
+                    zIndex: 8,
+                  }}
+                  onClick={() => navigate(BOWLS.indexOf(bowl))}
+                  initial={{ opacity: 0, scale: 0.6 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ ...SPRING, delay: 0.07 * tIdx }}
+                  whileTap={{ scale: 0.88 }}
+                  whileHover={{ scale: 1.14, borderColor: "#F26522" }}
+                >
+                  <img src={bowl.image} alt={bowl.name} className="w-full h-full object-contain" />
+                </motion.button>
+              );
+            })}
           </motion.div>
 
           {/* Bowl name / tagline */}
@@ -438,7 +448,6 @@ export function Hero() {
               const slot = tIdx + 1;
               if (slot >= SLOTS.length) return null;
               const pos = SLOTS[slot];
-              const isHighlight = slot === 1;
               return (
                 <motion.button
                   key={bowl.id + "-thumb"}
@@ -447,13 +456,13 @@ export function Hero() {
                     width: 80, height: 80,
                     left: pos.x / 700 * 100 + "%", top: pos.y / 600 * 100 + "%",
                     transform: "translate(-50%, -50%)", zIndex: 8,
-                    border: isHighlight ? "2px solid #F26522" : "2px solid #1A2432",
+                    border: "2px solid rgba(255,255,255,0.1)",
                     boxShadow: "0 4px 16px rgba(0,0,0,0.4)", background: "#1A2432",
                     touchAction: "manipulation",
                   }}
                   onClick={() => navigate(BOWLS.indexOf(bowl))}
                   initial={{ opacity: 0, scale: 0.6 }}
-                  animate={{ opacity: 1, scale: isHighlight ? 1.15 : 1 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{ ...SPRING, delay: 0.08 * tIdx }}
                   whileHover={{ scale: 1.18, borderColor: "#F26522" }}
                 >
