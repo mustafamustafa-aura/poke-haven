@@ -15,14 +15,17 @@ export function Navbar() {
 
   const scrollTo = (id: string) => {
     setMenuOpen(false);
-    if (!id) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    if (!id) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
   const links = [
-    { label: "Menu",                     id: "menu" },
+    { label: "Menu", id: "menu" },
     { label: "Stel Je Eigen Bowl Samen", id: "builder" },
-    { label: "Over Ons",                 id: "about" },
+    { label: "Over Ons", id: "about" },
   ];
 
   return (
@@ -39,21 +42,28 @@ export function Navbar() {
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="container mx-auto px-4 flex items-center justify-between">
-
         {/* Logo */}
         <button
           onClick={() => scrollTo("")}
           className="flex items-center gap-2"
-          style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
+          style={{
+            touchAction: "manipulation",
+            WebkitTapHighlightColor: "transparent",
+          }}
           data-testid="button-logo"
         >
           <img
             src="/logo.png"
             alt="Poke Haven"
             style={{ height: 48, width: "auto" }}
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
           />
-          <span className="font-display font-black tracking-tight leading-none" style={{ fontSize: 20 }}>
+          <span
+            className="font-display font-black tracking-tight leading-none"
+            style={{ fontSize: 20 }}
+          >
             <span style={{ color: "#fff" }}>PO</span>
             <span style={{ color: "#59B259" }}>K</span>
             <span style={{ color: "#fff" }}>E </span>
@@ -71,8 +81,12 @@ export function Navbar() {
               onClick={() => scrollTo(link.id)}
               style={{ color: "#A0AEC0", touchAction: "manipulation" }}
               className="transition-colors duration-200 hover:text-white whitespace-nowrap"
-              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#fff"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#A0AEC0"; }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.color = "#A0AEC0";
+              }}
               data-testid={`nav-${link.id}`}
             >
               {link.label}
@@ -85,16 +99,32 @@ export function Navbar() {
           <button
             onClick={openCart}
             className="relative flex items-center justify-center w-10 h-10 rounded-full transition-colors"
-            style={{ background: "rgba(255,255,255,0.07)", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.13)"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; }}
+            style={{
+              background: "rgba(255,255,255,0.07)",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "rgba(255,255,255,0.13)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "rgba(255,255,255,0.07)";
+            }}
             data-testid="button-cart"
             aria-label="Winkelwagen"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <circle cx="9" cy="21" r="1.5" fill="#fff" />
               <circle cx="19" cy="21" r="1.5" fill="#fff" />
-              <path d="M1 1h3l2.68 13.39a2 2 0 001.98 1.61H19a2 2 0 001.96-1.61L23 6H6" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M1 1h3l2.68 13.39a2 2 0 001.98 1.61H19a2 2 0 001.96-1.61L23 6H6"
+                stroke="#fff"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
             <AnimatePresence>
               {totalCount > 0 && (
@@ -117,7 +147,12 @@ export function Navbar() {
           <button
             onClick={() => scrollTo("builder")}
             className="font-bold text-sm px-4 py-2.5 rounded-full text-white transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{ background: "#F26522", boxShadow: "0 0 16px rgba(242,101,34,0.35)", touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
+            style={{
+              background: "#F26522",
+              boxShadow: "0 0 16px rgba(242,101,34,0.35)",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+            }}
             data-testid="button-order-now"
           >
             Bestel Nu
@@ -127,7 +162,11 @@ export function Navbar() {
           <button
             className="lg:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5 rounded-xl"
             onClick={() => setMenuOpen(!menuOpen)}
-            style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent", background: menuOpen ? "rgba(255,255,255,0.08)" : "transparent" }}
+            style={{
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+              background: menuOpen ? "rgba(255,255,255,0.08)" : "transparent",
+            }}
             aria-label="Menu"
             data-testid="button-mobile-menu"
           >
@@ -158,7 +197,10 @@ export function Navbar() {
         {menuOpen && (
           <motion.div
             className="lg:hidden overflow-hidden"
-            style={{ background: "rgba(14,22,33,0.98)", borderTop: "1px solid rgba(255,255,255,0.06)" }}
+            style={{
+              background: "rgba(14,22,33,0.98)",
+              borderTop: "1px solid rgba(255,255,255,0.06)",
+            }}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}

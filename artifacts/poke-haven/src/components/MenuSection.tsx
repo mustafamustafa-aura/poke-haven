@@ -79,34 +79,63 @@ function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
     <motion.div
       data-testid={`card-${item.id}`}
       className="relative flex flex-col cursor-pointer"
-      style={{ background: "#1A2432", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 16, boxShadow: "0 8px 32px rgba(0,0,0,0.3)" }}
-      variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } }}
-      whileHover={{ y: -6, boxShadow: "0 20px 48px rgba(0,0,0,0.45)", borderColor: "#F26522", transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
+      style={{
+        background: "#1A2432",
+        border: "1px solid rgba(255,255,255,0.06)",
+        borderRadius: 16,
+        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+        willChange: "transform",
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+      }}
+      variants={{
+        hidden: { opacity: 0, y: 40 },
+        show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+      }}
+      whileHover={{ y: -5, boxShadow: "0 20px 48px rgba(0,0,0,0.45)", borderColor: "#F26522", transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } }}
+      whileTap={{ scale: 0.97 }}
     >
       {item.tag && (
         <div
-          className="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full z-10"
-          style={{ background: (TAG_COLOR[item.tag] || "#F26522") + "22", color: TAG_COLOR[item.tag] || "#F26522", border: `1px solid ${(TAG_COLOR[item.tag] || "#F26522")}44` }}
+          className="absolute top-2 left-2 sm:top-3 sm:left-3 font-bold rounded-full z-10"
+          style={{
+            fontSize: "clamp(9px, 2.5vw, 11px)",
+            padding: "2px 8px",
+            background: (TAG_COLOR[item.tag] || "#F26522") + "22",
+            color: TAG_COLOR[item.tag] || "#F26522",
+            border: `1px solid ${(TAG_COLOR[item.tag] || "#F26522")}44`,
+          }}
         >
           {item.tag}
         </div>
       )}
-      <div className="flex justify-center pt-6 pb-2 overflow-hidden">
+
+      <div className="flex justify-center pt-4 sm:pt-6 pb-1 sm:pb-2">
         {item.image ? (
           <motion.img
             src={item.image}
             alt={item.name}
             className="object-contain"
-            style={{ width: 110, height: 110, background: "transparent" }}
+            style={{
+              width: "clamp(72px, 20vw, 110px)",
+              height: "clamp(72px, 20vw, 110px)",
+              background: "transparent",
+              willChange: "transform",
+            }}
             whileHover={{ scale: 1.06, rotate: 3, y: -4 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           />
         ) : (
           <div
             className="flex items-center justify-center rounded-full"
-            style={{ width: 110, height: 110, background: "rgba(242,101,34,0.08)", border: "1.5px dashed rgba(242,101,34,0.25)" }}
+            style={{
+              width: "clamp(72px, 20vw, 110px)",
+              height: "clamp(72px, 20vw, 110px)",
+              background: "rgba(242,101,34,0.08)",
+              border: "1.5px dashed rgba(242,101,34,0.25)",
+            }}
           >
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
               <path d="M12 3C7 3 3 7 3 12s4 9 9 9 9-4 9-9-4-9-9-9z" stroke="#F26522" strokeWidth="1.2" strokeLinecap="round" fill="rgba(242,101,34,0.08)" />
               <path d="M7 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#F26522" strokeWidth="1.2" strokeLinecap="round" />
               <path d="M5 14h14" stroke="#F26522" strokeWidth="1.2" strokeLinecap="round" />
@@ -114,19 +143,45 @@ function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
           </div>
         )}
       </div>
-      <div className="p-4 flex flex-col flex-1">
-        <h3 className="font-display font-bold text-white text-sm mb-1">{item.name}</h3>
+
+      <div className="p-3 sm:p-4 flex flex-col flex-1">
+        <h3
+          className="font-display font-bold text-white mb-1 leading-snug"
+          style={{ fontSize: "clamp(11px, 3vw, 14px)" }}
+        >
+          {item.name}
+        </h3>
         <Stars n={item.rating} />
-        <p className="text-xs mt-2 leading-relaxed flex-1" style={{ color: "#A0AEC0" }}>{item.desc}</p>
-        <div className="flex items-center justify-between mt-4">
-          <span className="font-bold text-white text-sm">{item.price}</span>
+        <p
+          className="mt-1.5 leading-relaxed flex-1 line-clamp-2 sm:line-clamp-none"
+          style={{ fontSize: "clamp(10px, 2.5vw, 12px)", color: "#A0AEC0" }}
+        >
+          {item.desc}
+        </p>
+        <div className="flex items-center justify-between mt-3 sm:mt-4 gap-1">
+          <span
+            className="font-bold text-white"
+            style={{ fontSize: "clamp(11px, 3vw, 14px)" }}
+          >
+            {item.price}
+          </span>
           <motion.button
-            className="px-4 py-2 rounded-full font-bold text-xs text-white"
-            style={{ background: "#59B259", touchAction: "manipulation" }}
+            className="rounded-full font-bold text-white"
+            style={{
+              background: "#59B259",
+              touchAction: "manipulation",
+              WebkitTapHighlightColor: "transparent",
+              fontSize: "clamp(9px, 2.5vw, 12px)",
+              padding: "clamp(5px, 1.5vw, 8px) clamp(8px, 2.5vw, 16px)",
+              whiteSpace: "nowrap",
+            }}
             whileHover={{ background: "#48BB78", scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
+            whileTap={{ scale: 0.93 }}
             data-testid={`button-add-${item.id}`}
-            onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.image })}
+            onClick={(e) => {
+              e.stopPropagation();
+              addItem({ id: item.id, name: item.name, price: item.price, image: item.image });
+            }}
           >
             + Bestellen
           </motion.button>
@@ -217,7 +272,8 @@ export function MenuSection() {
 
   return (
     <section id="menu" className="py-24 relative overflow-hidden" style={{ background: "#0E1621" }}>
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 1, background: "rgba(242,101,34,0.2)" }} />
+      {/* Gradient accent strip */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg, transparent 0%, #F26522 25%, #59B259 75%, transparent 100%)", opacity: 0.85 }} />
 
       <div className="container mx-auto px-5">
 
@@ -270,11 +326,12 @@ export function MenuSection() {
           {activeCat === "signature" ? (
             <motion.div
               key="signature"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-5"
+              className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 xl:grid-cols-5"
               initial="hidden"
-              animate="show"
+              whileInView="show"
+              viewport={{ once: true, margin: "-40px" }}
               exit={{ opacity: 0 }}
-              variants={{ show: { transition: { staggerChildren: 0.08 } }, hidden: {} }}
+              variants={{ show: { transition: { staggerChildren: 0.12 } }, hidden: {} }}
             >
               {[...SIGNATURE].sort((a, b) => (a.image ? 0 : 1) - (b.image ? 0 : 1)).map((item) => <BowlCard key={item.id} item={item} />)}
             </motion.div>
