@@ -1,0 +1,16 @@
+[build]
+  command = "pnpm install && pnpm --filter @workspace/poke-haven run build"
+  publish = "artifacts/poke-haven/dist/public"
+
+# Proxy API to your hosted backend (set API_URL in Netlify env, e.g. https://your-api.railway.app)
+[[redirects]]
+  from = "/api/*"
+  to = ":API_URL/api/:splat"
+  status = 200
+  force = true
+  conditions = {Environment = ["API_URL"]}
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

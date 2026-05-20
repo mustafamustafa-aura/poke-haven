@@ -148,7 +148,7 @@ export function Footer() {
               </p>
               {/* Google Maps link */}
               <a
-                href="https://www.google.com/maps/place/POKE+HAVEN+(+Pok%C3%A9+bowls+)/@50.8272216,3.2697093,17z"
+                href="https://www.google.com/maps/search/?api=1&query=Poke+Haven+Steenpoort+13+Kortrijk"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 mt-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all"
@@ -186,7 +186,7 @@ export function Footer() {
               }}
             >
               <iframe
-                src="https://maps.google.com/maps?q=50.8272216,3.2697093&z=17&output=embed"
+               src="https://www.google.com/maps?q=Poke+Haven+Steenpoort+13+Kortrijk&output=embed"
                 width="100%"
                 height="110"
                 style={{ border: 0, display: "block" }}
@@ -275,15 +275,12 @@ export function Footer() {
             Kortrijk
           </p>
           <div className="flex gap-4">
-            {["Privacybeleid", "Algemene Voorwaarden"].map((t) => (
-              <button
-                key={t}
-                className="hover:text-white transition-colors"
-                style={{ touchAction: "manipulation" }}
-              >
-                {t}
-              </button>
-            ))}
+            <a href="/privacy.html" className="hover:text-white transition-colors">
+              Privacybeleid
+            </a>
+            <a href="/voorwaarden.html" className="hover:text-white transition-colors">
+              Algemene Voorwaarden
+            </a>
           </div>
         </div>
       </div>

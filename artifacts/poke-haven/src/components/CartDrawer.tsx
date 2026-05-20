@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/cart";
+import { apiUrl, readApiError } from "@/lib/api";
 
 export function CartDrawer() {
   const { items, totalCount, totalPrice, isOpen, closeCart, updateQty, removeItem, clearCart } = useCart();
@@ -12,26 +13,34 @@ export function CartDrawer() {
   const [error, setError] = useState("");
 
   async function handlePlace() {
+    if (items.length === 0) return;
+    if (phone.trim() && !/^[\d\s+\-()]{6,20}$/.test(phone.trim())) {
+      setError("Voer een geldig telefoonnummer in.");
+      return;
+    }
     setPlacing(true);
     setError("");
     try {
-      const res = await fetch("/api/orders", {
+      const res = await fetch(apiUrl("/api/orders"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          customerName: name || undefined,
-          customerPhone: phone || undefined,
-          notes: notes || undefined,
+          customerName: name.trim() || undefined,
+          customerPhone: phone.trim() || undefined,
+          notes: notes.trim() || undefined,
           items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image })),
           total: totalPrice,
         }),
       });
-      if (!res.ok) throw new Error("Server error");
+      if (!res.ok) {
+        setError(await readApiError(res, "Er ging iets fout. Probeer het opnieuw."));
+        return;
+      }
       setSuccess(true);
       clearCart();
       setTimeout(() => { setSuccess(false); setName(""); setPhone(""); setNotes(""); closeCart(); }, 3000);
     } catch {
-      setError("Er ging iets fout. Probeer het opnieuw.");
+      setError("Kan geen verbinding maken met de server. Probeer het later opnieuw.");
     } finally {
       setPlacing(false);
     }

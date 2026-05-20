@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/lib/cart";
 
 const MATEN = [
   { name: "Regular",  prijs: 0,    omschrijving: "€13.90 – standaard maat" },
@@ -113,7 +114,25 @@ const STAP_EXTRAS = { id: "extras" as const, titel: "Extra's (Optioneel)", sub: 
 const ALL_STAP_IDS = [...STAPPEN.map(s => s.id), "extras"];
 const TOTAAL_STAPPEN = STAPPEN.length + 1;
 
+function buildCustomBowlId(keuzes: Keuzes): string {
+  const parts = [
+    keuzes.maat[0],
+    keuzes.basis[0],
+    keuzes.saus[0],
+    keuzes.eiwit[0],
+    ...keuzes.garneringen,
+    ...keuzes.toppings,
+    ...keuzes.extras.map((e) => e.naam),
+  ].filter(Boolean);
+  return `custom-${parts.join("-").replace(/\s+/g, "_").toLowerCase().slice(0, 120)}`;
+}
+
+function buildCustomBowlName(keuzes: Keuzes): string {
+  return `Eigen Bowl · ${keuzes.eiwit[0] ?? "Custom"}`;
+}
+
 export function BowlBuilder() {
+  const { addItem } = useCart();
   const [stap, setStap] = useState(0);
   const [keuzes, setKeuzes] = useState<Keuzes>(initKeuzes);
   const [klaar, setKlaar] = useState(false);
@@ -155,15 +174,30 @@ export function BowlBuilder() {
 
   const kanVolgende = isExtrasStap ? true : (keuzes[huidig!.id]?.length ?? 0) > 0;
 
+  const placeInCart = () => {
+    const required = ["maat", "basis", "saus", "eiwit"] as const;
+    if (!required.every((k) => keuzes[k].length > 0)) return;
+    addItem({
+      id: buildCustomBowlId(keuzes),
+      name: buildCustomBowlName(keuzes),
+      price: `€${totaal.toFixed(2)}`,
+      image: null,
+    });
+    setKlaar(true);
+  };
+
   if (klaar) {
     return (
       <section id="builder" className="py-24" style={{ background: "#0E1621" }}>
         <div className="container mx-auto px-5 max-w-2xl text-center">
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}>
             <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl" style={{ background: "rgba(89,178,89,0.15)", border: "2px solid #59B259" }}>✓</div>
-            <h2 className="font-display font-bold text-3xl text-white mb-4">Bowl Geplaatst!</h2>
+            <h2 className="font-display font-bold text-3xl text-white mb-4">Bowl in Winkelwagen!</h2>
             <p className="text-base mb-2" style={{ color: "#A0AEC0" }}>
               {keuzes.basis[0]} · {keuzes.eiwit[0]} · {keuzes.saus[0]}
+            </p>
+            <p className="text-sm mb-4" style={{ color: "#59B259" }}>
+              Open je winkelwagen om je bestelling te plaatsen.
             </p>
             {keuzes.garneringen.length > 0 && (
               <p className="text-sm mb-2" style={{ color: "#A0AEC0" }}>{keuzes.garneringen.join(" · ")}</p>
@@ -462,7 +496,7 @@ export function BowlBuilder() {
               </button>
             ) : (
               <button
-                onClick={() => setKlaar(true)}
+                onClick={placeInCart}
                 className="px-4 md:px-8 py-3 rounded-full font-bold text-sm text-white transition-all active:scale-95"
                 style={{ background: "#59B259", boxShadow: "0 0 18px rgba(89,178,89,0.3)", touchAction: "manipulation", WebkitTapHighlightColor: "transparent", minHeight: 48 }}
                 data-testid="button-bestelling-plaatsen"

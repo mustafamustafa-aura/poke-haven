@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/cart";
 
@@ -15,6 +15,167 @@ const SIGNATURE: { id: string; name: string; price: string; image: string | null
   { id: "vlees",         name: "Vlees Speciaal",        price: "€13.90", image: "/bowl-vlees.png",            tag: null,         desc: "Bruine rijst, Hawaiiaanse mayo, Haven aioli, wortel, cherrytomaatjes, paprika, rode ui, gemarineerd rundvlees, amandelen, cashewnoten, sesammix", rating: 4.8 },
   { id: "shoyu-tofu",    name: "Shoyu Tofu",            price: "€13.90", image: "/bowl-tofu.png",             tag: "Vegan",      desc: "Bruine rijst, Hawaiiaanse mayo, srirachamayo, avocado, komkommer, maïs, cherrytomaatjes, gemarineerde tofu, amandelen, cashewnoten, sesammix", rating: 4.7 },
 ];
+
+type SignatureItem = (typeof SIGNATURE)[number];
+
+function parseIngredients(desc: string): string[] {
+  return desc.split(/,\s*/).map((s) => s.trim()).filter(Boolean);
+}
+
+function BowlDetailModal({
+  item,
+  onClose,
+}: {
+  item: SignatureItem;
+  onClose: () => void;
+}) {
+  const { addItem } = useCart();
+  const ingredients = parseIngredients(item.desc);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  const handleOrder = () => {
+    addItem({ id: item.id, name: item.name, price: item.price, image: item.image });
+    onClose();
+  };
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-4 sm:p-6"
+      style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(6px)" }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22 }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="bowl-modal-title"
+    >
+      <motion.div
+        className="relative w-full max-w-md max-h-[min(90vh,720px)] overflow-y-auto rounded-2xl sm:rounded-3xl"
+        style={{
+          background: "#1A2432",
+          border: "1px solid rgba(255,255,255,0.1)",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.55)",
+        }}
+        initial={{ y: 48, opacity: 0, scale: 0.96 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: 32, opacity: 0, scale: 0.98 }}
+        transition={{ type: "spring", damping: 28, stiffness: 320 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full flex items-center justify-center"
+          style={{ background: "rgba(255,255,255,0.1)", color: "#fff" }}
+          aria-label="Sluiten"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1l12 12M13 1L1 13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          </svg>
+        </button>
+
+        <div
+          className="flex justify-center items-center pt-8 pb-4 px-6"
+          style={{ background: "linear-gradient(180deg, rgba(14,22,33,0.6) 0%, transparent 100%)" }}
+        >
+          {item.image ? (
+            <img
+              src={item.image}
+              alt={item.name}
+              className="object-contain"
+              style={{ width: "min(220px, 70vw)", height: "min(220px, 70vw)" }}
+            />
+          ) : (
+            <div
+              className="flex items-center justify-center rounded-full"
+              style={{
+                width: "min(180px, 55vw)",
+                height: "min(180px, 55vw)",
+                background: "rgba(242,101,34,0.08)",
+                border: "1.5px dashed rgba(242,101,34,0.25)",
+              }}
+            >
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3C7 3 3 7 3 12s4 9 9 9 9-4 9-9-4-9-9-9z" stroke="#F26522" strokeWidth="1.2" fill="rgba(242,101,34,0.08)" />
+                <path d="M7 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="#F26522" strokeWidth="1.2" strokeLinecap="round" />
+                <path d="M5 14h14" stroke="#F26522" strokeWidth="1.2" strokeLinecap="round" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        <div className="px-6 pb-6">
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div>
+              {item.tag && (
+                <span
+                  className="inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mb-2"
+                  style={{
+                    background: (TAG_COLOR[item.tag] || "#F26522") + "22",
+                    color: TAG_COLOR[item.tag] || "#F26522",
+                    border: `1px solid ${(TAG_COLOR[item.tag] || "#F26522")}44`,
+                  }}
+                >
+                  {item.tag}
+                </span>
+              )}
+              <h3 id="bowl-modal-title" className="font-display font-bold text-white text-xl leading-snug">
+                {item.name}
+              </h3>
+              <div className="mt-1">
+                <Stars n={item.rating} />
+              </div>
+            </div>
+            <span className="font-display font-black text-2xl shrink-0" style={{ color: "#F26522" }}>
+              {item.price}
+            </span>
+          </div>
+
+          <p className="text-xs font-bold tracking-widest uppercase mb-3" style={{ color: "#59B259" }}>
+            Ingrediënten
+          </p>
+          <ul className="flex flex-col gap-2 mb-6">
+            {ingredients.map((ing) => (
+              <li
+                key={ing}
+                className="flex items-start gap-2 text-sm leading-relaxed"
+                style={{ color: "#A0AEC0" }}
+              >
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "#59B259" }} />
+                {ing}
+              </li>
+            ))}
+          </ul>
+
+          <motion.button
+            type="button"
+            className="w-full py-4 rounded-full font-bold text-white text-sm"
+            style={{ background: "#59B259", boxShadow: "0 0 20px rgba(89,178,89,0.35)" }}
+            whileHover={{ scale: 1.02, background: "#48BB78" }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleOrder}
+            data-testid={`modal-button-add-${item.id}`}
+          >
+            Bestellen
+          </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 /* ─── Drinks & desserts as structured text lists ──────────────────────────── */
 const DRANKEN = {
@@ -72,12 +233,27 @@ function Stars({ n }: { n: number }) {
   );
 }
 
-function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
+function BowlCard({
+  item,
+  onView,
+}: {
+  item: SignatureItem;
+  onView: (item: SignatureItem) => void;
+}) {
   const { addItem } = useCart();
 
   return (
     <motion.div
       data-testid={`card-${item.id}`}
+      role="button"
+      tabIndex={0}
+      onClick={() => onView(item)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onView(item);
+        }
+      }}
       className="relative flex flex-col cursor-pointer"
       style={{
         background: "#1A2432",
@@ -153,10 +329,16 @@ function BowlCard({ item }: { item: typeof SIGNATURE[0] }) {
         </h3>
         <Stars n={item.rating} />
         <p
-          className="mt-1.5 leading-relaxed flex-1 line-clamp-2 sm:line-clamp-none"
+          className="mt-1.5 leading-relaxed flex-1 line-clamp-2"
           style={{ fontSize: "clamp(10px, 2.5vw, 12px)", color: "#A0AEC0" }}
         >
           {item.desc}
+        </p>
+        <p
+          className="mt-1.5 text-xs font-semibold"
+          style={{ color: "#F26522" }}
+        >
+          Klik om te bekijken →
         </p>
         <div className="flex items-center justify-between mt-3 sm:mt-4 gap-1">
           <span
@@ -264,6 +446,7 @@ function DrankenPanel() {
 
 export function MenuSection() {
   const [activeCat, setActiveCat] = useState("signature");
+  const [selectedBowl, setSelectedBowl] = useState<SignatureItem | null>(null);
 
   const TABS = [
     { id: "signature", label: "Signature Bowls" },
@@ -333,7 +516,9 @@ export function MenuSection() {
               exit={{ opacity: 0 }}
               variants={{ show: { transition: { staggerChildren: 0.12 } }, hidden: {} }}
             >
-              {[...SIGNATURE].sort((a, b) => (a.image ? 0 : 1) - (b.image ? 0 : 1)).map((item) => <BowlCard key={item.id} item={item} />)}
+              {[...SIGNATURE].sort((a, b) => (a.image ? 0 : 1) - (b.image ? 0 : 1)).map((item) => (
+                <BowlCard key={item.id} item={item} onView={setSelectedBowl} />
+              ))}
             </motion.div>
           ) : (
             <motion.div
@@ -367,6 +552,12 @@ export function MenuSection() {
           </motion.div>
         )}
       </div>
+
+      <AnimatePresence>
+        {selectedBowl && (
+          <BowlDetailModal item={selectedBowl} onClose={() => setSelectedBowl(null)} />
+        )}
+      </AnimatePresence>
     </section>
   );
 }

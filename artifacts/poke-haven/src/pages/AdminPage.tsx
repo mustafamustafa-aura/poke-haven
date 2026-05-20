@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import { apiUrl, adminHeaders, readApiError } from "@/lib/api";
 
 interface OrderItem { id: string; name: string; price: string; quantity: number; }
 interface Order {
@@ -39,39 +40,78 @@ export function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [authKey, setAuthKey] = useState(() => sessionStorage.getItem("poke-haven-admin-key") ?? "");
+  const [keyInput, setKeyInput] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [fetchError, setFetchError] = useState("");
 
   const fetchOrders = useCallback(async () => {
+    setFetchError("");
     try {
-      const res = await fetch("/api/orders");
-      if (res.ok) setOrders((await res.json()).reverse());
+      const res = await fetch(apiUrl("/api/orders"), { headers: adminHeaders() });
+      if (res.status === 401) {
+        sessionStorage.removeItem("poke-haven-admin-key");
+        setAuthKey("");
+        setAuthError("Ongeldige toegangssleutel.");
+        return;
+      }
+      if (!res.ok) {
+        setFetchError(await readApiError(res, "Kon bestellingen niet laden."));
+        return;
+      }
+      setOrders((await res.json()).reverse());
+    } catch {
+      setFetchError("Kan geen verbinding maken met de server.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    if (!authKey) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     fetchOrders();
     const interval = setInterval(fetchOrders, 8000);
     return () => clearInterval(interval);
-  }, [fetchOrders]);
+  }, [fetchOrders, authKey]);
+
+  function saveKey() {
+    const trimmed = keyInput.trim();
+    if (!trimmed) return;
+    sessionStorage.setItem("poke-haven-admin-key", trimmed);
+    setAuthKey(trimmed);
+    setAuthError("");
+    setLoading(true);
+  }
 
   async function advance(order: Order) {
     const next = FLOW[order.status];
     if (!next) return;
-    await fetch(`/api/orders/${order.id}`, {
+    const res = await fetch(apiUrl(`/api/orders/${order.id}`), {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...adminHeaders() },
       body: JSON.stringify({ status: next }),
     });
+    if (!res.ok) {
+      setFetchError(await readApiError(res, "Status bijwerken mislukt."));
+      return;
+    }
     fetchOrders();
   }
 
   async function cancel(order: Order) {
-    await fetch(`/api/orders/${order.id}`, {
+    const res = await fetch(apiUrl(`/api/orders/${order.id}`), {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...adminHeaders() },
       body: JSON.stringify({ status: "cancelled" }),
     });
+    if (!res.ok) {
+      setFetchError(await readApiError(res, "Annuleren mislukt."));
+      return;
+    }
     fetchOrders();
   }
 
@@ -79,9 +119,38 @@ export function AdminPage() {
   const filtered = filter === "all" ? orders : orders.filter((o) => o.status === filter);
   const activeCount = orders.filter((o) => o.status === "pending" || o.status === "preparing").length;
 
+  if (!authKey) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-5" style={{ background: "#0E1621", color: "#fff" }}>
+        <div className="w-full max-w-md rounded-2xl p-8" style={{ background: "#1A2432", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <h1 className="font-display font-black text-2xl text-white mb-2">Admin Dashboard</h1>
+          <p className="text-sm mb-6" style={{ color: "#A0AEC0" }}>Voer je beheerderssleutel in om bestellingen te bekijken.</p>
+          <input
+            type="password"
+            value={keyInput}
+            onChange={(e) => setKeyInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && saveKey()}
+            placeholder="Admin sleutel"
+            className="w-full rounded-lg px-3 py-3 text-sm text-white outline-none mb-3"
+            style={{ background: "#0E1621", border: "1px solid rgba(255,255,255,0.1)" }}
+            autoComplete="off"
+          />
+          {authError && <p className="text-xs mb-3" style={{ color: "#F87171" }}>{authError}</p>}
+          <button
+            onClick={saveKey}
+            className="w-full py-3 rounded-full font-bold text-white text-sm"
+            style={{ background: "#F26522" }}
+          >
+            Inloggen
+          </button>
+          <a href="/" className="block text-center text-xs mt-4" style={{ color: "#4A5568" }}>← Terug naar site</a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen" style={{ background: "#0E1621", color: "#fff" }}>
-      {/* Header */}
       <div style={{ background: "#111C2B", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
         <div className="container mx-auto px-5 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -100,12 +169,24 @@ export function AdminPage() {
             <button onClick={fetchOrders} className="text-xs px-3 py-1.5 rounded-lg font-medium" style={{ background: "rgba(255,255,255,0.07)", color: "#A0AEC0" }}>
               Vernieuwen
             </button>
+            <button
+              onClick={() => { sessionStorage.removeItem("poke-haven-admin-key"); setAuthKey(""); }}
+              className="text-xs px-3 py-1.5 rounded-lg font-medium"
+              style={{ background: "rgba(255,255,255,0.04)", color: "#4A5568" }}
+            >
+              Uitloggen
+            </button>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-5 py-8">
-        {/* Filter tabs */}
+        {fetchError && (
+          <p className="text-sm text-center mb-6 px-4 py-3 rounded-xl" style={{ background: "rgba(220,38,38,0.1)", color: "#F87171", border: "1px solid rgba(220,38,38,0.2)" }}>
+            {fetchError}
+          </p>
+        )}
+
         <div className="flex gap-2 flex-wrap mb-8">
           {TABS.map((tab) => (
             <button
@@ -148,7 +229,6 @@ export function AdminPage() {
                 className="rounded-2xl p-5 flex flex-col gap-4"
                 style={{ background: "#1A2432", border: `1px solid ${STATUS_COLORS[order.status]}33` }}
               >
-                {/* Order header */}
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="flex items-center gap-2">
@@ -164,7 +244,6 @@ export function AdminPage() {
                   <span className="font-black text-white">{order.total}</span>
                 </div>
 
-                {/* Customer info */}
                 {(order.customerName || order.customerPhone) && (
                   <div className="text-sm rounded-lg px-3 py-2" style={{ background: "#0E1621" }}>
                     {order.customerName && <p className="font-semibold text-white">{order.customerName}</p>}
@@ -172,7 +251,6 @@ export function AdminPage() {
                   </div>
                 )}
 
-                {/* Items */}
                 <div className="flex flex-col gap-1.5">
                   {order.items.map((item, i) => (
                     <div key={i} className="flex justify-between text-sm">
@@ -182,14 +260,12 @@ export function AdminPage() {
                   ))}
                 </div>
 
-                {/* Notes */}
                 {order.notes && (
                   <div className="text-xs rounded-lg px-3 py-2" style={{ background: "rgba(242,101,34,0.07)", color: "#F26522", border: "1px solid rgba(242,101,34,0.15)" }}>
                     📝 {order.notes}
                   </div>
                 )}
 
-                {/* Actions */}
                 {(FLOW[order.status] || order.status === "pending" || order.status === "preparing") && (
                   <div className="flex gap-2 mt-auto pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                     {FLOW[order.status] && (

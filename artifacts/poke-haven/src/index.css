@@ -159,3 +159,9 @@
 .font-display {
   font-family: var(--app-font-display);
 }
+
+#menu,
+#builder,
+#about {
+  scroll-margin-top: 7rem;
+}

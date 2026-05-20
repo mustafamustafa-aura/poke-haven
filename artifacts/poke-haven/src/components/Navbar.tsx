@@ -13,13 +13,25 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollTo = (id: string) => {
+  const scrollToSection = (id: string) => {
+    const wasMenuOpen = menuOpen;
     setMenuOpen(false);
-    if (!id) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+    const runScroll = () => {
+      if (!id) {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      const el = document.getElementById(id);
+      if (!el) return;
+      const headerOffset = 110;
+      const top = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    };
+
+    requestAnimationFrame(() => {
+      setTimeout(runScroll, wasMenuOpen ? 300 : 0);
+    });
   };
 
   const links = [
@@ -44,7 +56,8 @@ export function Navbar() {
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
         <button
-          onClick={() => scrollTo("")}
+          type="button"
+          onClick={() => scrollToSection("")}
           className="flex items-center gap-2"
           style={{
             touchAction: "manipulation",
@@ -78,7 +91,8 @@ export function Navbar() {
           {links.map((link) => (
             <button
               key={link.id}
-              onClick={() => scrollTo(link.id)}
+              type="button"
+              onClick={() => scrollToSection(link.id)}
               style={{ color: "#A0AEC0", touchAction: "manipulation" }}
               className="transition-colors duration-200 hover:text-white whitespace-nowrap"
               onMouseEnter={(e) => {
@@ -145,7 +159,8 @@ export function Navbar() {
 
           {/* CTA */}
           <button
-            onClick={() => scrollTo("builder")}
+            type="button"
+            onClick={() => scrollToSection("builder")}
             className="font-bold text-sm px-4 py-2.5 rounded-full text-white transition-all duration-300 hover:scale-105 active:scale-95"
             style={{
               background: "#F26522",
@@ -192,42 +207,62 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Mobile menu overlay */}
       <AnimatePresence>
         {menuOpen && (
-          <motion.div
-            className="lg:hidden overflow-hidden"
-            style={{
-              background: "rgba(14,22,33,0.98)",
-              borderTop: "1px solid rgba(255,255,255,0.06)",
-            }}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="px-5 py-3 flex flex-col">
-              {links.map((link, i) => (
-                <motion.button
-                  key={link.id}
-                  onClick={() => scrollTo(link.id)}
-                  className="text-left py-4 font-semibold text-base border-b"
-                  style={{
-                    color: "#fff",
-                    borderColor: "rgba(255,255,255,0.06)",
-                    touchAction: "manipulation",
-                    WebkitTapHighlightColor: "transparent",
-                  }}
-                  initial={{ opacity: 0, x: -12 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 + 0.05 }}
-                  data-testid={`mobile-nav-${link.id}`}
-                >
-                  {link.label}
-                </motion.button>
-              ))}
-            </div>
-          </motion.div>
+          <>
+            <motion.button
+              type="button"
+              aria-label="Menu sluiten"
+              className="fixed inset-0 z-40 lg:hidden cursor-default"
+              style={{ background: "rgba(0,0,0,0.55)", top: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              onClick={() => setMenuOpen(false)}
+            />
+            <motion.nav
+              className="lg:hidden relative z-[60] overflow-hidden"
+              style={{
+                background: "rgba(14,22,33,0.98)",
+                borderTop: "1px solid rgba(255,255,255,0.06)",
+              }}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              aria-label="Mobiel menu"
+            >
+              <div className="px-5 py-3 flex flex-col">
+                {links.map((link, i) => (
+                  <motion.button
+                    key={link.id}
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      scrollToSection(link.id);
+                    }}
+                    className="text-left py-4 font-semibold text-base border-b w-full"
+                    style={{
+                      color: "#fff",
+                      borderColor: "rgba(255,255,255,0.06)",
+                      touchAction: "manipulation",
+                      WebkitTapHighlightColor: "transparent",
+                      cursor: "pointer",
+                    }}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 + 0.05 }}
+                    data-testid={`mobile-nav-${link.id}`}
+                  >
+                    {link.label}
+                  </motion.button>
+                ))}
+              </div>
+            </motion.nav>
+          </>
         )}
       </AnimatePresence>
     </motion.header>
