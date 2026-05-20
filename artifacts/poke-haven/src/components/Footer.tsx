@@ -79,7 +79,7 @@ export function Footer() {
               <img
                 src="/logo.png"
                 alt="Poke Haven"
-                style={{ height: 44, width: "auto" }}
+                style={{ height: 100, width: "auto" }}
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).style.display = "none";
                 }}

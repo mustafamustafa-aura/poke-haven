@@ -55,7 +55,7 @@ export function Navbar() {
           <img
             src="/logo.png"
             alt="Poke Haven"
-            style={{ height: 48, width: "auto" }}
+            style={{ height: 110, width: "auto" }}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).style.display = "none";
             }}
