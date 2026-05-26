@@ -99,8 +99,8 @@ export function Hero() {
         className="container mx-auto px-5 relative w-full"
         style={{ zIndex: 10 }}
       >
-        {/* ── MOBILE layout (hidden on lg+) ── */}
-        <div className="flex flex-col items-start text-left lg:hidden pt-2 pb-8">
+        {/* ── MOBILE layout (hidden) ── */}
+        <div className="hidden">
 
           {/* Headline */}
           {["Vers.", "Gedurfd.", "Poke."].map((word, i) => (
@@ -304,10 +304,10 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* ── DESKTOP layout (hidden below lg) ── */}
-        <div className="hidden lg:grid lg:grid-cols-[1fr_1fr] gap-8 items-center min-h-[calc(100vh-5rem)]">
+        {/* ── DESKTOP layout (visible on all screens) ── */}
+        <div className="grid grid-cols-[1fr_1fr] gap-3 sm:gap-6 lg:gap-8 items-start sm:items-center min-h-[calc(100vh-5rem)]">
           {/* Left: Text */}
-          <div className="flex flex-col items-start text-left space-y-5">
+          <div className="flex flex-col items-start text-left space-y-2 sm:space-y-5">
             {["Vers.", "Gedurfd.", "Poke."].map((word, i) => (
               <div key={word} className="overflow-hidden">
                 <motion.span
@@ -400,7 +400,7 @@ export function Hero() {
           </div>
 
           {/* Right: Orbital carousel */}
-          <div className="relative" style={{ height: "min(620px, 82vh)" }}>
+          <div className="relative" style={{ height: "clamp(300px, 82vh, 620px)" }}>
             <svg viewBox="0 0 700 600" className="absolute inset-0 w-full h-full" style={{ overflow: "visible" }} aria-hidden="true">
               <path d={ARC_PATH} fill="none" stroke="#F26522" strokeOpacity="0.35" strokeWidth="1.5" strokeDasharray="6 8" strokeLinecap="round" />
               {SLOTS.slice(1).map((s, i) => (
