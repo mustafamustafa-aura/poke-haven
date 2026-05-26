@@ -1,6 +1,6 @@
+import { supabase } from "@/lib/supabase"
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { apiUrl, adminHeaders, readApiError } from "@/lib/api";
 
 interface OrderItem { id: string; name: string; price: string; quantity: number; }
 interface Order {
@@ -48,18 +48,31 @@ export function AdminPage() {
   const fetchOrders = useCallback(async () => {
     setFetchError("");
     try {
-      const res = await fetch(apiUrl("/api/orders"), { headers: adminHeaders() });
-      if (res.status === 401) {
-        sessionStorage.removeItem("poke-haven-admin-key");
-        setAuthKey("");
-        setAuthError("Ongeldige toegangssleutel.");
-        return;
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .order("created_at", { ascending: false })
+
+      if (error) {
+        setFetchError(error.message)
+        return
       }
-      if (!res.ok) {
-        setFetchError(await readApiError(res, "Kon bestellingen niet laden."));
-        return;
-      }
-      setOrders((await res.json()).reverse());
+
+      // Map DB fields (snake_case) to UI-friendly camelCase names
+      const mapped = (data || []).map((r: any) => ({
+        id: r.id,
+        customerName: r.customer_name ?? null,
+        customerPhone: r.phone ?? null,
+        items: r.items ?? [],
+        total: typeof r.total === "number"
+          ? new Intl.NumberFormat("nl-BE", { style: "currency", currency: "EUR" }).format(r.total)
+          : r.total,
+        notes: r.notes ?? null,
+        status: r.status,
+        createdAt: r.created_at,
+      })) as Order[];
+
+      setOrders(mapped);
     } catch {
       setFetchError("Kan geen verbinding maken met de server.");
     } finally {
@@ -90,28 +103,30 @@ export function AdminPage() {
   async function advance(order: Order) {
     const next = FLOW[order.status];
     if (!next) return;
-    const res = await fetch(apiUrl(`/api/orders/${order.id}`), {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...adminHeaders() },
-      body: JSON.stringify({ status: next }),
-    });
-    if (!res.ok) {
-      setFetchError(await readApiError(res, "Status bijwerken mislukt."));
+    const { error } = await supabase
+      .from("orders")
+      .update({ status: next })
+      .eq("id", order.id);
+
+    if (error) {
+      setFetchError(error.message || "Status bijwerken mislukt.");
       return;
     }
+
     fetchOrders();
   }
 
   async function cancel(order: Order) {
-    const res = await fetch(apiUrl(`/api/orders/${order.id}`), {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...adminHeaders() },
-      body: JSON.stringify({ status: "cancelled" }),
-    });
-    if (!res.ok) {
-      setFetchError(await readApiError(res, "Annuleren mislukt."));
+    const { error } = await supabase
+      .from("orders")
+      .update({ status: "cancelled" })
+      .eq("id", order.id);
+
+    if (error) {
+      setFetchError(error.message || "Annuleren mislukt.");
       return;
     }
+
     fetchOrders();
   }
 

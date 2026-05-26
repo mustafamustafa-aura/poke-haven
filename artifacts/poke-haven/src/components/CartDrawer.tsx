@@ -1,7 +1,7 @@
+import { supabase } from "@/lib/supabase"
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/lib/cart";
-import { apiUrl, readApiError } from "@/lib/api";
 
 export function CartDrawer() {
   const { items, totalCount, totalPrice, isOpen, closeCart, updateQty, removeItem, clearCart } = useCart();
@@ -21,20 +21,24 @@ export function CartDrawer() {
     setPlacing(true);
     setError("");
     try {
-      const res = await fetch(apiUrl("/api/orders"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          customerName: name.trim() || undefined,
-          customerPhone: phone.trim() || undefined,
-          notes: notes.trim() || undefined,
-          items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image })),
-          total: totalPrice,
-        }),
-      });
-      if (!res.ok) {
-        setError(await readApiError(res, "Er ging iets fout. Probeer het opnieuw."));
-        return;
+      const total = parseFloat(totalPrice.replace("€", "").replace(",", ".")) || 0;
+      const { error } = await supabase.from("orders").insert([
+        {
+          customer_name: name.trim() || undefined,
+          phone: phone.trim() || undefined,
+          items: items.map((i) => ({
+            id: i.id,
+            name: i.name,
+            price: i.price,
+            quantity: i.quantity,
+            image: i.image
+          })),
+          total,
+        }
+      ])
+      
+      if (error) {
+        throw error
       }
       setSuccess(true);
       clearCart();
